@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>基于rope长度外推方法 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="盘点基于RoPE的长度外推方法演进，从最朴素的位置内插到NTK-RoPE，再到YaRN等方法。 前RoPE时代的长度扩展方法直接微调适应就是要多长就训练多长，比如任务需要2048长度就训练2048长度。这样需要较多的算力和数据适应长上下文窗口。 使用弱外推性质位置编码使用如ALiBE等有弱外推性质的位置编码，在正常的长度训练模型，期待位置编码的弱外推性质进行长度外推。这种方法目前外推能力较弱，因此">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于rope长度外推方法">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="盘点基于RoPE的长度外推方法演进，从最朴素的位置内插到NTK-RoPE，再到YaRN等方法。 前RoPE时代的长度扩展方法直接微调适应就是要多长就训练多长，比如任务需要2048长度就训练2048长度。这样需要较多的算力和数据适应长上下文窗口。 使用弱外推性质位置编码使用如ALiBE等有弱外推性质的位置编码，在正常的长度训练模型，期待位置编码的弱外推性质进行长度外推。这种方法目前外推能力较弱，因此">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-06-13T13:59:48.000Z">
+<meta property="article:modified_time" content="2024-08-06T12:05:50.524Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="位置编码">
+<meta property="article:tag" content="长度外推">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '基于rope长度外推方法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-08-06 20:05:50'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">39</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">58</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">基于rope长度外推方法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-13T13:59:48.000Z" title="发表于 2024-06-13 21:59:48">2024-06-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-08-06T12:05:50.524Z" title="更新于 2024-08-06 20:05:50">2024-08-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="基于rope长度外推方法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>盘点基于RoPE的长度外推方法演进，从最朴素的位置内插到NTK-RoPE，再到YaRN等方法。</p>
+<h2 id="前RoPE时代的长度扩展方法"><a href="#前RoPE时代的长度扩展方法" class="headerlink" title="前RoPE时代的长度扩展方法"></a>前RoPE时代的长度扩展方法</h2><h3 id="直接微调适应"><a href="#直接微调适应" class="headerlink" title="直接微调适应"></a>直接微调适应</h3><p>就是要多长就训练多长，比如任务需要2048长度就训练2048长度。这样需要较多的算力和数据适应长上下文窗口。</p>
+<h3 id="使用弱外推性质位置编码"><a href="#使用弱外推性质位置编码" class="headerlink" title="使用弱外推性质位置编码"></a>使用弱外推性质位置编码</h3><p>使用如ALiBE等有弱外推性质的位置编码，在正常的长度训练模型，期待位置编码的弱外推性质进行长度外推。这种方法目前外推能力较弱，因此LLM使用较少。</p>
+<h2 id="位置内插-PI"><a href="#位置内插-PI" class="headerlink" title="位置内插(PI)"></a>位置内插(PI)</h2><p>相对位置的OOD，直接表现就是预测阶段的相对位置超出了训练时的范围，由于没有被训练过，“越界”部分的行为无法预估。位置内插(Position Interpolation, PI)通过线性缩放输入位置索引来匹配原始上下文窗口，避免在训练期间未见过的更长上下文长度上进行外推。<br>方法是对位置索引进行线性缩放，将预测位置的长文本位置编码乘上因子$\frac{L<em>{train}}{L</em>{test}}$，缩放到训练长度内。</p>
+<p>训练阶段: $(1,2,3,\dots,n-1,n)$</p>
+<p>预测阶段: $(1,2,3,\dots,n,n+1,\dots,2n-1,2n) \rightarrow (\frac{1}{2},1,\frac{3}{2},\dots,n-\frac{1}{2},n)$</p>
+<p><img src="/images/circle_graph.png" alt="PI示意图"></p>
+<p>注意：PI方法直接插值位置索引，而非插值位置嵌入。而RoPE应用了三角函数，使得位置索引具有周期性。这个特性对后续NTK-RoPE、YaRN的改进很重要，也是免训长度外推的重要基础。</p>
+<p>优点：</p>
+<ul>
+<li>相比直接训练更长上下文长度进行外推的方案，PI只需要少量的微调步骤（1000步以内）就能适应扩展数倍的上下文窗口。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>不是免训练外推方案，不进行额外的微调效果不佳。</li>
+</ul>
+<h2 id="NTK-RoPE"><a href="#NTK-RoPE" class="headerlink" title="NTK-RoPE"></a>NTK-RoPE</h2><p>从信息编码的角度来看RoPE，通过神经切线核（Neural Tangent Kernel, NTK）理论分析表明：如果输入维度较低，且相应的嵌入没有高频分量，则深度神经网络在学习高频信息方面存在困难。一维输入（即token位置）通过 RoPE 扩展为 n 维复数向量嵌入。<strong>通过PI进行缩放会均匀地降低频率，这可能会阻止模型学习高频特征。</strong></p>
+<p>从转圈的视角进行分析可能更加直观，因为RoPE对第$i$组向量进行位置编码的方式如下：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+f\big((q_{2i}, q_{2i+1}),m\big) = \begin{pmatrix}
+\cos m\theta_{i} & -\sin m\theta_{i} \\
+\sin m\theta_{i} & \cos m\theta_{i}
+\end{pmatrix}
+\begin{pmatrix}
+q_{2i} \\
+q_{2i+1}
+\end{pmatrix}
+\end{equation}</script><p>相当于将原来的二维向量旋转$m*\theta_{i}$角度，如下图所示：<br><img src="/images/rope_rotate.png" alt="rope转圈视角示意图"><br>可以知道如果转超过$2\pi$的角度，就已经完成一周了，比这更大的将在转更多圈。而：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+m \theta_{i} = m*base^{-2i/d}
+\end{equation}</script><p>当$i\rightarrow 0$时，$m\theta_i$随$m$变化而变化范围非常大，有很多超过$2\pi$的值，也即转了很多圈。反之，当$i \rightarrow d/2-1$时，$m\theta_i$随$m$变化而变化范围很小，甚至低于$2\pi$，也即一周都没有转完。</p>
+<p>从直觉上讲，转了很多圈的组（即高频部分）对圈内的每个位置都进行了比较充分的训练，因此具有很强的外推性。而转圈少的组（低频部分）一圈内可能都有位置没有训练过，但它训练过的位置间隔小，内插性好。</p>
+<p>然而PI方法并没有考虑RoPE的这个特性，而是统一进行内插，所以导致高频部分的表现较差。</p>
+<p>这也就引出了NTK-RoPE的核心：<strong>高频外推，低频内插。</strong></p>
+<p>一种新的方法，即”NTK-aware”插值法可以达成该目的。它不再对每组$m$变为$m * \frac{L<em>{train}}{L</em>{test}}$，而是从$base$入手，通过乘一个外推因子$k$来实现：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\theta_{i} = (base * k)^{-2i/d}
+\end{equation}</script><p>k的推导是通过令$i=d/2-1$时的效果恰好等于内插插值效果实现的，即：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+(base * k)^{-2*(d/2-1)/d} = \frac{L_{train}}{L_{test}} base^{-2*(d/2-1)/d}
+\end{equation}</script><p>解这个方程可以得到外推因子$k$的解：</p>
+<script type="math/tex; mode=display">
+k = {\frac{L_{test}}{L_{train}}}^{\frac{d}{d-2}}</script><p>这样在低频部分，NTK-aware的表现就更接近线性插值，而在高频部分表现就更接近不进行插值而直接进行外推，从而达到“低频内插，高频外推”的目的。</p>
+<p>优点：</p>
+<ul>
+<li>具备免训练进行外推的能力，不微调的情况下在长序列上显示出比PI更低的困惑度。</li>
+<li>实现简单，只需要修改base的值即可。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>低频部分并不是只有$i=d/2-1$时的$\theta_i$才转得不足一周，仍有进步空间。</li>
+</ul>
+<h2 id="YaRN"><a href="#YaRN" class="headerlink" title="YaRN"></a>YaRN</h2><p>YaRN补偿NTK-RoPE的不足，主要从插值方法(NTK-by-parts)和注意力缩放两个方面改善困惑度。并且还通过动态缩放来避免短序列上的性能下降。</p>
+<h3 id="NTK-by-parts"><a href="#NTK-by-parts" class="headerlink" title="NTK-by-parts"></a>NTK-by-parts</h3><p>从YaRN的视角看，并非只有时的才转得不足一周，所以NTK-RoPE只让最后一个做完整的内插，是不够充分的，事实上确实也是如此。对第$i$个组来说，可以计算出整个训练过程所转的“圈数”$r_i$为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+r_i = \frac{\max_{m}{m\theta_i}}{2 \pi} = \frac{\theta_i L_{train}}{2 \pi}
+\end{equation}</script><p>可以设定一个阈值$r$，如果圈数超过$r$的，就认为已经充分训练了，可以直接进行外推。圈数少于1的，就使用PI的方法将范围重新放缩到已经训练过的地方。圈数多于1而小于$r$的，就两者兼而有之，并通过系数进行衡量两种处理方式的强弱。即：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\theta^{new}_{i} = \big [r_i + (1-r_i) \frac{L_{train}}{L_{test}} \big ] , \ r_i = \left\{ \begin{aligned}
+&1, &r_i>r\\ 
+&0, & r_i < 1\\
+&\frac{r_i - 1}{r - 1} , & others
+\end{aligned} \right .
+\end{equation}</script><p>这样就将NTK-RoPE中“高频外推，低频内插”的想法用到极致了。</p>
+<h3 id="注意力分数缩放"><a href="#注意力分数缩放" class="headerlink" title="注意力分数缩放"></a>注意力分数缩放</h3><p>此外，YaRN在注意力权重的Softmax计算引入了一个温度因子$t$，作者实验发现对注意力进行缩放有助于在扩展上下文时保持模型性能。也即变更原始注意力为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\text{softmax} \big ( \frac{q_m^T k_n}{t \sqrt{d}} \big )
+\end{equation}</script><p>这个事情也可以转化成直接对$q$和$k$放缩到原来的$\frac{1}{\sqrt{t}}$而不改变原始Attention实现。作者通过实验确定了$t$的最佳点。<br><img src="/images/u_graph.png" alt="t的最佳点实验"></p>
+<p>发现以下放成对于很多模型和数据都适用：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\frac{1}{\sqrt{t}} = 0.1 \ln(s) + 1
+\end{equation}</script><p>其中$s=\frac{L<em>{test}}{L</em>{train}}$。</p>
+<h3 id="动态缩放"><a href="#动态缩放" class="headerlink" title="动态缩放"></a>动态缩放</h3><p>上面提到的免训练长度外推方法，都无法使得模型在训练长度$L<em>{train}$内的效果保持不变。具体来说，设原本模型为$f(x)$，做了外推改动后的模型是$f^+(x)$，当x的长度不超过$L</em>{train}$时，无法保证$f(x)≡f^+(x)$。由于$f(x)$就是在$L<em>{train}$内训练的，因此可以合理地认为$f(x)$对于长度不超过$L</em>{train}$的样本效果是最优的，于是$f^+(x)≠f(x)$意味着长度外推虽然使得更长的样本效果变好了，但原本$L_{train}$内的效果却变差了。</p>
+<p>解决这种扩大上下文窗口而导致短序列效果变差的方法是动态缩放(Dynamic Scaling)，该方案最初是在Reddit帖子中提出的。将上文提到到缩放因子$s$从固定的$s=\frac{L<em>{test}}{L</em>{train}}$改为和位置有关的变量，即：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+s(l) = \left \{ \begin{aligned} 
+&\frac{l}{L_{train}}, &\text{if}\ \frac{l}{L_{train}} > 1 \\
+&1, &\text{otherwise}
+\end{aligned} \right .
+\end{equation}</script><p>通过动态缩放的技术，YaRN在$L<em>{test} = L</em>{train}$的条件下也能有出色的表现。</p>
+<p>总结一下YaRN的优点和缺点。</p>
+<p>优点：</p>
+<ul>
+<li>更充分地利用了NTK-RoPE的“低频内插，高频外推”的想法，进一步提升了免训条件下的外推能力。</li>
+<li>调整注意力分数来提升免训条件下的外推能力</li>
+<li>应用动态缩放，保护了$L_{train}$长度下LLM的能力。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>个人认为转圈超参数$r$还依赖于人工设定，可以引入搜索方法来搜索更好的$r$。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/">https://lisheng2001.github.io/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">位置编码</a><a class="post-meta__tags" href="/tags/%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8/">长度外推</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/14/%E5%8F%91%E5%B8%83python%E5%8C%85/" title="发布python包"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">发布python包</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/13/sinusoidal%E7%AE%80%E4%BB%8B/" title="sinusoidal简介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">sinusoidal简介</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/06/13/rope%E7%AE%80%E4%BB%8B/" title="rope简介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-13</div><div class="title">rope简介</div></div></a></div><div><a href="/2024/06/13/sinusoidal%E7%AE%80%E4%BB%8B/" title="sinusoidal简介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-13</div><div class="title">sinusoidal简介</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">39</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">58</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8DRoPE%E6%97%B6%E4%BB%A3%E7%9A%84%E9%95%BF%E5%BA%A6%E6%89%A9%E5%B1%95%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">前RoPE时代的长度扩展方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%BE%AE%E8%B0%83%E9%80%82%E5%BA%94"><span class="toc-number">1.1.</span> <span class="toc-text">直接微调适应</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%BC%B1%E5%A4%96%E6%8E%A8%E6%80%A7%E8%B4%A8%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81"><span class="toc-number">1.2.</span> <span class="toc-text">使用弱外推性质位置编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%8D%E7%BD%AE%E5%86%85%E6%8F%92-PI"><span class="toc-number">2.</span> <span class="toc-text">位置内插(PI)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NTK-RoPE"><span class="toc-number">3.</span> <span class="toc-text">NTK-RoPE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YaRN"><span class="toc-number">4.</span> <span class="toc-text">YaRN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NTK-by-parts"><span class="toc-number">4.1.</span> <span class="toc-text">NTK-by-parts</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E5%8A%9B%E5%88%86%E6%95%B0%E7%BC%A9%E6%94%BE"><span class="toc-number">4.2.</span> <span class="toc-text">注意力分数缩放</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E7%BC%A9%E6%94%BE"><span class="toc-number">4.3.</span> <span class="toc-text">动态缩放</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/08/06/ar5iv%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC%E5%A4%87%E4%BB%BD/" title="ar5iv油猴脚本备份">ar5iv油猴脚本备份</a><time datetime="2024-08-06T11:50:33.000Z" title="发表于 2024-08-06 19:50:33">2024-08-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/07/26/%E7%BB%88%E7%AB%AF%E5%85%B3%E9%97%AD%E5%90%8E%E7%BB%A7%E7%BB%AD%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E7%9A%84%E6%96%B9%E6%B3%95/" title="终端关闭后继续执行命令的方法">终端关闭后继续执行命令的方法</a><time datetime="2024-07-26T07:19:43.000Z" title="发表于 2024-07-26 15:19:43">2024-07-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/07/08/%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC%E9%97%AE%E9%A2%98/" title="回溯法求解数独问题">回溯法求解数独问题</a><time datetime="2024-07-08T04:36:27.000Z" title="发表于 2024-07-08 12:36:27">2024-07-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/" title="细节处见真章——LLM中的tokenizer">细节处见真章——LLM中的tokenizer</a><time datetime="2024-06-27T12:11:31.000Z" title="发表于 2024-06-27 20:11:31">2024-06-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/21/%E4%B8%80%E9%81%93%E7%89%A9%E7%90%86%E9%A2%98/" title="一道物理题">一道物理题</a><time datetime="2024-06-21T05:43:17.000Z" title="发表于 2024-06-21 13:43:17">2024-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
