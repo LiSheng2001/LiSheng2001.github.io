@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>浅谈批量大小与学习率之间的关系 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="在训练的时候增大了批次大小，然后学习率不变，期待能获得相似的训练结果并且缩短训练时间的。但是事实却是训练时间确实有缩短，但损失函数的下降却不如调整之前那么好了。这意味着更改每次传入的批次大小，即使学习率没变（随机种子这些也都没变），但由于间接的影响，模型在同一个数据集上的“学习能力”却发生了变化。 增大Batch Size之后发生了什么？ 那在其他超参数不变的时候，增大Batch Size会发生什">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈批量大小与学习率之间的关系">
+<meta property="og:url" content="https://lisheng2001.github.io/2023/04/24/%E6%B5%85%E8%B0%88%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="在训练的时候增大了批次大小，然后学习率不变，期待能获得相似的训练结果并且缩短训练时间的。但是事实却是训练时间确实有缩短，但损失函数的下降却不如调整之前那么好了。这意味着更改每次传入的批次大小，即使学习率没变（随机种子这些也都没变），但由于间接的影响，模型在同一个数据集上的“学习能力”却发生了变化。 增大Batch Size之后发生了什么？ 那在其他超参数不变的时候，增大Batch Size会发生什">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2023-04-24T12:53:14.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.463Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="学习率">
+<meta property="article:tag" content="批量大小">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2023/04/24/%E6%B5%85%E8%B0%88%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '浅谈批量大小与学习率之间的关系',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">浅谈批量大小与学习率之间的关系</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-24T12:53:14.000Z" title="发表于 2023-04-24 20:53:14">2023-04-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.463Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="浅谈批量大小与学习率之间的关系"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>在训练的时候增大了批次大小，然后学习率不变，期待能获得相似的训练结果并且缩短训练时间的。但是事实却是训练时间确实有缩短，但损失函数的下降却不如调整之前那么好了。这意味着更改每次传入的批次大小，即使学习率没变（随机种子这些也都没变），但由于间接的影响，模型在同一个数据集上的“学习能力”却发生了变化。</p>
+<h2 id="增大batch-size之后发生了什么">增大Batch
+Size之后发生了什么？</h2>
+<p>那在其他超参数不变的时候，增大Batch
+Size会发生什么呢？一个显著的变化就是模型每次会在一个batch里面加载更多的样本，然后前向传播之后再反向传播计算平均损失。也就意味着增大Batch
+Size，会使得损失方差更小，因为它每个批次对更多的样本进行了平均。</p>
+<p>从一个极端的角度看，设置batch_size=1时，如果有一个错误标注的样本被混入数据集中了，那对于已经学到一些分类特征的模型来说，恰好加载到它的那一个批次损失将会非常大；在加载下一个正常样本时，损失又会变小到正常水平。反映到损失曲线的变化上就是损失函数突然出现一个锯齿形状的变化。由于batch_size是1，这个非常大的损失是直接作用于模型权重上了，会使得模型在这个批次上处于一个“被误导”的状态。但由于后面的样本大部分都是正确标注的，所以这个误差会被后面的训练纠正。</p>
+<p>但当设置batch_size非常大时，那个错误标注样本的损失被大部分的正确样本稀释掉，所以这个误导模型的损失没有产生太大的影响，模型向着一个比较纯净的梯度方向在移动。</p>
+<p>但反过来想，如果那个损失大的样本并不是错误标注的样本，只是分类难度高于数据集平均水平的难样本的话，那在batch_size=1时，模型能更好的接受这个难样本的损失然后进行调整；但batch_size非常大的时候，大部分的样本被模型正确分对，难样本虽然损失大，但损失被这个批次的样本稀释后就变小了，似乎模型更难根据这个难样本进行调整了。</p>
+<p>上述两种情况的结果是相似的，就是<strong>当批量大小增加时，每个批次的损失的方差会变小，模型的损失下降曲线会变得更加光滑</strong>。</p>
+<p>还有一个问题，就是在训练的时候，一般是固定训练集训练的轮次而不是训练的步数（固定训练步数的做法在预训练过程中比较常见，但微调的时候因为数据集大小差异很大，一般是对训练轮数做限制来防止过拟合）。那<strong>固定训练的轮次之后，大的批量意味着更少的步数，也就是模型在使用更大的batch_size的时候会经历更少次的权重更新</strong>（这也是大批量能加快训练速度的原因之一）。</p>
+<h2 id="更大的batch-size下学习率该怎么变化呢">更大的Batch
+Size下学习率该怎么变化呢？</h2>
+<p>那结合这两点来看，大的batch_size让每次损失都更能反映整个数据集上的平均损失了，受异常点的影响更小了，但同时，更大的batch_size也意味着修改权重的机会更少了。<strong>从直觉上来讲，训练时用更大批量的设置可能需要更大的学习率</strong>，因为它更新的不频繁，而且每个批量损失相对小批量来说更能代表数据集上的真实损失。</p>
+<h2 id="可以量化这两者的变化关系吗">可以量化这两者的变化关系吗？</h2>
+<p>已经有一些研究提出了在使用大的批量代替小批量同时保存训练和泛化精度的办法，<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.02677">Goyal等</a>提出了一个在实验上被证明有效的<code>Linear Scaling Rule</code>：</p>
+<blockquote>
+<p><em><strong>Linear Scaling Rule:</strong> When the minibatch size is
+multiplied by <span class="math inline">\(k\)</span>, multiply the
+learning rate by <span class="math inline">\(k\)</span>.</em></p>
+</blockquote>
+<p>这个线性缩放定律就是说batch_size增大了k倍，那学习率相应的也要增加k倍，这样可以匹配在不同batch_size下的训练精度。</p>
+<p>当然这只是一种有实验佐证的说法，在深度学习社区也有另外一种观点(<a
+target="_blank" rel="noopener" href="https://github.com/Lightning-AI/lightning/discussions/3706">来源</a>)，就是batch_size增大k倍，那学习率应该增大<span
+class="math inline">\(\sqrt{k}\)</span>倍来匹配不同batch_size下的训练精度。</p>
+<p>其实到这里，问题就已经有了一个初步的答案，不管是k倍还是<span
+class="math inline">\(\sqrt{k}\)</span>倍，都意味着在增大batch_size后我们应当调大学习率使得精度与现在的训练相匹配。</p>
+<h2 id="增大学习率后训练失败了">增大学习率后训练失败了</h2>
+<p><a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.02677">Goyal等</a>在论文里指出，对于大batch_size来说，当网络快速变化的时候，线性缩放规则失效，这通常发生在训练的早期阶段。作者们也给出了解决方案，就是在训练时设计适当的<code>warmup</code>来实现。<code>warmup</code>即预热，在训练开始的时候使用更小的学习率，然后在训练的过程中逐渐将学习率从一个比较小的值提升到预定的学习率上。</p>
+<p>所以如果增大batch_size后将学习率调大之后训练的损失飞了，可以试着使用<code>warmup</code>来调整一下早期的学习率。</p>
+<h2
+id="学习率和批量大小存在关系的其他证据">学习率和批量大小存在关系的其他证据</h2>
+<p><a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/1711.00489">Smith等</a>的这篇论文<em>Don't
+Decay the Learning Rate, Increase the Batch
+Size</em>里指出了在训练过程中降低学习率和增加批量大小都能够在训练集和测试集上获得相同的学习曲线。那也就反过来印证了，增大批量大小就等效于减少学习率了，所以如果其他超参数不变时，如果要增加批量大小，那应该适当加大学习率来抵消这种影响。</p>
+<p>我是很佩服这种调查清楚的精神，不过这个作者说在训练期间增加批量大小可以获得更大的并行性和更短的训练时间我有点迷糊。如果显存还有剩的可以用来增大批量大小，那说明一开始那个批量就没有太利用完所有的显存，那可以设计更大的学习率和更大的批量大小来在最开始就充分利用显存来获得更短的训练时间；如果显存没剩的了，增加批量大小好像就OOM了？</p>
+<p>不过现在很多大模型训练也依然是降低学习率啦，估计是那时候大批量训练很具有挑战性，这个作者提出的可能是一种折衷的方案，在训练的过程中逐渐增加批量既没有早期大批量训飞loss的风险又可以在后期逐渐把硬件资源利用起来。现在可能通过<code>warmup</code>前期的loss问题缓解了，因此现在的模型依然是最开始就把显存利用起来然后后期缩减学习率的做法。</p>
+<h2 id="为什么增大batch-size呢">为什么增大Batch Size呢？</h2>
+<p>那为什么好好的要增大Batch
+Size，一般的话是为了更快的训练速度。它的提速主要来源于下面两个方面：</p>
+<p>一是可以增加并行性。因为深度学习模型往往都是比较深的，这样下一层的计算就不得不等到上一层的算完才能开始。所以如果每层中的计算没有占满GPU，那就会造成GPU并行效率的浪费。但如果一个批次中有很多样本，一个层的计算已经占满了整个GPU的计算资源，那这样GPU的计算资源就被充分利用了，也就会显得计算快了。</p>
+<p>二是可以减少模型权重更新次数。上面说到batch_size大了之后训练的步数就会变小，那对模型权重的更新次数也会少，就把权重更新的时间省下来一些，也会显得训练变快了。</p>
+<h2 id="把batch-size也当作超参数吧">把Batch Size也当作超参数吧！</h2>
+<p>这是很多深度学习论文的做法。也许会疑惑，如果线性缩放策略真能奏效，那么调batch
+size可以等效于调学习率。但事实是学习率不变的情况下，调batch_size也能看到模型性能有改动。调学习率可能确实能等效于调批量大小，但如果把批量大小当超参数的话，学习率就能少设置一些候选也能搜索比较大的超参数空间。</p>
+<p>所以，因为我们的终极目标是在数据集上获得更好的指标，所以不要不去调批量大小，就当是在调学习率一样从2的倍数开始调，万一效果更好了呢。</p>
+<p>大概就这么多了吧，<strong>总结一下，如果batch_size增大了，要保持训练的精度不变的话，不妨试试把学习率往上调一些(<span
+class="math inline">\(k\)</span>倍或<span
+class="math inline">\(\sqrt{k}\)</span>倍)。</strong></p>
+<p>参考资料：</p>
+<ol type="1">
+<li><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/64864995">【AI不惑境】学习率和batchsize如何影响模型的性能？</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.baeldung.com/cs/learning-rate-batch-size">Relation
+Between Learning Rate and Batch Size</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.02677">Accurate, Large Minibatch
+SGD: Training ImageNet in 1 Hour</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1711.00489">Don't Decay the Learning
+Rate, Increase the Batch Size</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2023/04/24/%E6%B5%85%E8%B0%88%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB/">https://lisheng2001.github.io/2023/04/24/浅谈批量大小与学习率之间的关系/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AD%A6%E4%B9%A0%E7%8E%87/">学习率</a><a class="post-meta__tags" href="/tags/%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F/">批量大小</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/05/06/%E6%B5%85%E8%B0%88%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98%E6%8D%9F%E5%A4%B1%E7%9A%84%E5%BD%A2%E5%BC%8F%E5%8C%96%E8%A1%A8%E7%A4%BA/" title="浅谈分类问题损失的形式化表示"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">浅谈分类问题损失的形式化表示</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/21/%E6%B5%85%E8%B0%88Linux%E4%B8%8B%E7%9A%84%E8%84%9A%E6%9C%AC%E8%BF%90%E8%A1%8C%E4%B8%8E%E5%8E%8B%E7%BC%A9%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B/" title="浅谈Linux下的脚本运行与压缩文件解压"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">浅谈Linux下的脚本运行与压缩文件解压</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9E%E5%A4%A7batch-size%E4%B9%8B%E5%90%8E%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">增大Batch
+Size之后发生了什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E5%A4%A7%E7%9A%84batch-size%E4%B8%8B%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%AF%A5%E6%80%8E%E4%B9%88%E5%8F%98%E5%8C%96%E5%91%A2"><span class="toc-number">2.</span> <span class="toc-text">更大的Batch
+Size下学习率该怎么变化呢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E4%BB%A5%E9%87%8F%E5%8C%96%E8%BF%99%E4%B8%A4%E8%80%85%E7%9A%84%E5%8F%98%E5%8C%96%E5%85%B3%E7%B3%BB%E5%90%97"><span class="toc-number">3.</span> <span class="toc-text">可以量化这两者的变化关系吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9E%E5%A4%A7%E5%AD%A6%E4%B9%A0%E7%8E%87%E5%90%8E%E8%AE%AD%E7%BB%83%E5%A4%B1%E8%B4%A5%E4%BA%86"><span class="toc-number">4.</span> <span class="toc-text">增大学习率后训练失败了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87%E5%92%8C%E6%89%B9%E9%87%8F%E5%A4%A7%E5%B0%8F%E5%AD%98%E5%9C%A8%E5%85%B3%E7%B3%BB%E7%9A%84%E5%85%B6%E4%BB%96%E8%AF%81%E6%8D%AE"><span class="toc-number">5.</span> <span class="toc-text">学习率和批量大小存在关系的其他证据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%A2%9E%E5%A4%A7batch-size%E5%91%A2"><span class="toc-number">6.</span> <span class="toc-text">为什么增大Batch Size呢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%8Abatch-size%E4%B9%9F%E5%BD%93%E4%BD%9C%E8%B6%85%E5%8F%82%E6%95%B0%E5%90%A7"><span class="toc-number">7.</span> <span class="toc-text">把Batch Size也当作超参数吧！</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>笔试杂项20240917 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="记录一下遇到的不会的杂类选择问题。 计算机网络 tcp报文 一个TCP连接的建立是通过三次握手来实现的   –&gt; [SYN] –&gt; (B)   假如服务器B和客户机A通讯. 当A要和B通信时，A首先向B发一个SYN (Synchronize) 标记的包，告诉B请求建立连接. 注意: 一个 SYN包就是仅SYN标记设为1的TCP包(参见TCP包头Resources). 认识到这点很重要，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="笔试杂项20240917">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/09/17/%E7%AC%94%E8%AF%95%E6%9D%82%E9%A1%B920240917/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="记录一下遇到的不会的杂类选择问题。 计算机网络 tcp报文 一个TCP连接的建立是通过三次握手来实现的   –&gt; [SYN] –&gt; (B)   假如服务器B和客户机A通讯. 当A要和B通信时，A首先向B发一个SYN (Synchronize) 标记的包，告诉B请求建立连接. 注意: 一个 SYN包就是仅SYN标记设为1的TCP包(参见TCP包头Resources). 认识到这点很重要，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-09-17T13:27:00.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.463Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="笔试">
+<meta property="article:tag" content="秋招">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/09/17/%E7%AC%94%E8%AF%95%E6%9D%82%E9%A1%B920240917/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '笔试杂项20240917',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">笔试杂项20240917</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-09-17T13:27:00.000Z" title="发表于 2024-09-17 21:27:00">2024-09-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.463Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="笔试杂项20240917"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>记录一下遇到的不会的杂类选择问题。</p>
+<h2 id="计算机网络">计算机网络</h2>
+<h3 id="tcp报文">tcp报文</h3>
+<p>一个TCP连接的建立是通过三次握手来实现的</p>
+<ol type="1">
+<li><ol type="A">
+<li>–&gt; [SYN] –&gt; (B)</li>
+</ol></li>
+</ol>
+<p>假如服务器B和客户机A通讯. 当A要和B通信时，A首先向B发一个SYN
+(Synchronize) 标记的包，告诉B请求建立连接.</p>
+<p>注意: 一个 SYN包就是仅SYN标记设为1的TCP包(参见TCP包头Resources).
+认识到这点很重要，只有当B受到A发来的SYN包，才可建立连接，除此之外别无他法。因此，如果你的防火墙丢弃所有的发往外网接口的SYN包，那么你将不能主动连接外部任何主机，除非不是TCP协议。</p>
+<ol start="2" type="1">
+<li><ol type="A">
+<li>&lt;– [SYN/ACK] &lt;–(B)</li>
+</ol></li>
+</ol>
+<p>接着，B收到后会发一个对SYN包的确认包(SYN/ACK)回去，表示对第一个SYN包的确认，并继续握手操作.</p>
+<p>注意: SYN/ACK包是仅SYN 和 ACK 标记为1的包.</p>
+<ol start="3" type="1">
+<li><ol type="A">
+<li>–&gt; [ACK] –&gt; (B)</li>
+</ol></li>
+</ol>
+<p>A收到SYN/ACK
+包,A发一个确认包(ACK)，通知B连接已建立。至此，三次握手完成，一个TCP连接完成</p>
+<p>Note: ACK包就是仅ACK 标记设为1的TCP包.
+需要注意的是当三此握手完成、连接建立以后，TCP连接的每个包都会设置ACK位</p>
+<p>握手阶段：</p>
+<table>
+<thead>
+<tr class="header">
+<th>序号</th>
+<th>方向</th>
+<th>seq</th>
+<th>ack</th>
+<th>SYN</th>
+<th>ACK</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>A-&gt;B</td>
+<td>10000</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>B-&gt;A</td>
+<td>20000</td>
+<td>10000+1=10001</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>A-&gt;B</td>
+<td>10001</td>
+<td>20000+1=20001</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>解释：</p>
+<p>1：A向B发起连接请求，以一个随机数初始化A的seq,这里假设为10000，此时ACK＝0</p>
+<p>2：B收到A的连接请求后，也以一个随机数初始化B的seq，这里假设为20000，意思是：你的请求我已收到，我这方的数据流就从这个数开始。B的ACK是A的seq加1，即10000＋1＝10001</p>
+<p>3：A收到B的回复后，它的seq是它的上个请求的seq加1，即10000＋1＝10001，意思也是：你的回复我收到了，我这方的数据流就从这个数开始。A此时的ACK是B的seq加1，即20000+1=20001</p>
+<h2 id="机器学习">机器学习</h2>
+<h3 id="l1和l2分别服从什么分布">L1和L2分别服从什么分布</h3>
+<p>L1是拉普拉斯分布，L2是高斯分布。</p>
+<h3 id="em算法">EM算法</h3>
+<p>最大期望算法（Expectation-maximization
+algorithm，又译为期望最大化算法），是在概率模型中寻找参数最大似然估计或者最大后验估计的算法，其中概率模型依赖于无法观测的隐性变量。</p>
+<p>最大期望算法经过两个步骤交替进行计算，</p>
+<p>第一步是计算期望（E），利用对隐藏变量的现有估计值，计算其最大似然估计值；
+第二步是最大化（M），最大化在E步上求得的最大似然值来计算参数的值。M步上找到的参数估计值被用于下一个E步计算中，这个过程不断交替进行。</p>
+<h3 id="最大熵模型">最大熵模型</h3>
+<p>最大熵模型（Maximum Entropy Model，以下简称MaxEnt），MaxEnt
+是概率模型学习中一个准则，其思想为：在学习概率模型时，所有可能的模型中熵最大的模型是最好的模型；若概率模型需要满足一些约束，则最大熵原理就是在满足已知约束的条件集合中选择熵最大模型。最大熵原理指出，对一个随机事件的概率分布进行预测时，预测应当满足全部已知的约束，而对未知的情况不要做任何主观假设。在这种情况下，概率分布最均匀，预测的风险最小，因此得到的概率分布的熵是最大。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/09/17/%E7%AC%94%E8%AF%95%E6%9D%82%E9%A1%B920240917/">https://lisheng2001.github.io/2024/09/17/笔试杂项20240917/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%AC%94%E8%AF%95/">笔试</a><a class="post-meta__tags" href="/tags/%E7%A7%8B%E6%8B%9B/">秋招</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/09/19/%E7%94%B0%E5%BF%8C%E8%B5%9B%E9%A9%AC%E9%97%AE%E9%A2%98/" title="田忌赛马问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">田忌赛马问题</div></div></a></div><div class="next-post pull-right"><a href="/2024/09/14/python%E4%B8%AD%E7%9A%84%E4%BD%8D%E8%BF%90%E7%AE%97/" title="python中的位运算"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">python中的位运算</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/09/14/python%E4%B8%AD%E7%9A%84%E4%BD%8D%E8%BF%90%E7%AE%97/" title="python中的位运算"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-14</div><div class="title">python中的位运算</div></div></a></div><div><a href="/2024/09/14/%E5%8D%B7%E7%A7%AF%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E5%9B%9E%E9%A1%BE/" title="卷积核心知识回顾"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-14</div><div class="title">卷积核心知识回顾</div></div></a></div><div><a href="/2024/09/19/%E7%94%B0%E5%BF%8C%E8%B5%9B%E9%A9%AC%E9%97%AE%E9%A2%98/" title="田忌赛马问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-19</div><div class="title">田忌赛马问题</div></div></a></div><div><a href="/2024/09/13/%E5%B8%B8%E8%A7%81%E7%BC%96%E7%A8%8B%E9%A2%98%E6%80%9D%E8%B7%AF%E7%9B%98%E7%82%B9-20240913/" title="常见编程题思路盘点-20240913"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-13</div><div class="title">常见编程题思路盘点-20240913</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C"><span class="toc-number">1.</span> <span class="toc-text">计算机网络</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp%E6%8A%A5%E6%96%87"><span class="toc-number">1.1.</span> <span class="toc-text">tcp报文</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0"><span class="toc-number">2.</span> <span class="toc-text">机器学习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#l1%E5%92%8Cl2%E5%88%86%E5%88%AB%E6%9C%8D%E4%BB%8E%E4%BB%80%E4%B9%88%E5%88%86%E5%B8%83"><span class="toc-number">2.1.</span> <span class="toc-text">L1和L2分别服从什么分布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#em%E7%AE%97%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">EM算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.3.</span> <span class="toc-text">最大熵模型</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

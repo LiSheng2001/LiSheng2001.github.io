@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>sinusoidal简介 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="简介 自注意力机制是没有位置信息的，即对于元素相同的向量序列，打乱顺序后之前每个元素的输出也依旧不变，这在自然语言里是不合理的。因此需要引入位置编码表征token在序列里的位置。 原始Transformer模型使用了Sinusoidal位置编码，不需要训练而是通过加入正余弦信息来为每个token加入顺序信息。标准的Sinusoidal形式如下： \[ \begin{equation}\left\{">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sinusoidal简介">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/06/13/sinusoidal%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="简介 自注意力机制是没有位置信息的，即对于元素相同的向量序列，打乱顺序后之前每个元素的输出也依旧不变，这在自然语言里是不合理的。因此需要引入位置编码表征token在序列里的位置。 原始Transformer模型使用了Sinusoidal位置编码，不需要训练而是通过加入正余弦信息来为每个token加入顺序信息。标准的Sinusoidal形式如下： \[ \begin{equation}\left\{">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-06-13T13:57:56.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.461Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="位置编码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/06/13/sinusoidal%E7%AE%80%E4%BB%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'sinusoidal简介',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">sinusoidal简介</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-13T13:57:56.000Z" title="发表于 2024-06-13 21:57:56">2024-06-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.461Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="sinusoidal简介"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="简介">简介</h2>
+<p>自注意力机制是没有位置信息的，即对于元素相同的向量序列，打乱顺序后之前每个元素的输出也依旧不变，这在自然语言里是不合理的。因此需要引入位置编码表征token在序列里的位置。
+原始Transformer模型使用了Sinusoidal位置编码，不需要训练而是通过加入正余弦信息来为每个token加入顺序信息。标准的Sinusoidal形式如下：
+<span class="math display">\[
+\begin{equation}\left\{\begin{aligned}&amp;p_{k,2i}=\sin(k/10000^{2i/d})\\
+&amp;p_{k, 2i+1}=\cos (k/10000^{2i/d} )
+\end{aligned}\right.
+\end{equation}
+\]</span></p>
+<h2 id="基本思路">基本思路</h2>
+<p>假设模型为<span
+class="math inline">\(f(⋯,x_m,⋯,x_n,⋯)\)</span>，其中标记出来的<span
+class="math inline">\(x_m,x_n\)</span>分别表示第m,n个输入，不失一般性，设f是标量函数。对于不带Attention
+Mask的纯Attention模型，它是全对称的，即对于任意的<span
+class="math inline">\(m,n\)</span>，都有： <span class="math display">\[
+\begin{equation}
+f(\cdots, x_m, \cdots, x_n, \cdots) = f(\cdots, x_n, \cdots, x_m,
+\cdots)
+\end{equation}
+\]</span> 公式(2)即Transformer无法识别位置的原因，函数天然满足<span
+class="math inline">\(f(x,y)=f(y,x)\)</span>，以至于无法从结果上区分输入的是<span
+class="math inline">\([x,y]\)</span>还是<span
+class="math inline">\([y,x]\)</span>。
+在每个位置上加上一个不同的编码向量： <span class="math display">\[
+\begin{equation}\tilde{f}(\cdots,x_m,\cdots,x_n,\cdots)=f(\cdots,x_m +
+p_m,\cdots,x_n + p_n,\cdots)\end{equation}
+\]</span>
+这样原来的对称性就被打破了，加一个位置编码可以用来区分token位置从而处理有序的输入了。</p>
+<h3 id="相对位置">相对位置</h3>
+<p>泰勒展开之后可发现有一个同时包含<span class="math inline">\(p_m,
+p_n\)</span>的交互项，记为<span class="math inline">\(p_m H
+p_n\)</span>，希望它能表达一定的相对位置信息。</p>
+<p>之后假设<span class="math inline">\(H=I\)</span>，那么<span
+class="math inline">\(p_m H p_n = p_m p_n = \lang p_m, p_n
+\rang\)</span>，即两个位置编码的内积。希望在这个简单的例子中该项表达的是相对位置信息，即存在某个函数<span
+class="math inline">\(g\)</span>使得 <span class="math display">\[
+\begin{equation}
+\lang p_m, p_n \rang = g(m-n)
+\end{equation}
+\]</span> 解这个方程可以得到正弦位置编码在2维情况下的显式解： <span
+class="math display">\[
+\begin{equation}
+p_m =
+\begin{pmatrix}
+\cos m\theta \\
+\sin m\theta
+\end{pmatrix}
+\end{equation}
+\]</span>
+由于内积满足线性叠加性，所以更高维的偶数维位置编码，我们可以表示为多个二维位置编码的组合:
+<span class="math display">\[
+\begin{equation}
+p_m =
+\begin{pmatrix}
+\cos m\theta_0 \\
+\sin m\theta_0 \\
+\cos m\theta_1 \\
+\sin m\theta_1 \\
+\vdots \\
+\cos m\theta_{d/2-1} \\
+\sin m\theta_{d/2-1} \\
+\end{pmatrix}
+\end{equation}
+\]</span></p>
+<h3 id="远程衰减">远程衰减</h3>
+<p>基于前面的假设，我们推导出了位置编码的形式(6)，它跟标准Sinusoidal位置编码(1)形式基本一样了，只是sin,cos的位置有点不同。一般情况下，神经网络的神经元都是无序的，所以哪怕打乱各个维度，也是一种合理的位置编码，因此除了各个<span
+class="math inline">\(θ_i\)</span>没确定下来外，式(6)和式(1)并无本质区别。</p>
+<p>式(1)的选择是<span
+class="math inline">\(θ_i=10000−2i/d\)</span>，这个选择有什么意义呢？事实上，这个形式有一个良好的性质：它使得随着<span
+class="math inline">\(|m−n|\)</span>的增大，<span
+class="math inline">\(⟨pm,pn⟩\)</span>有着趋于零的趋势。按照我们的直观想象，相对距离越大的输入，其相关性应该越弱，因此这个性质是符合我们的直觉的。</p>
+<figure>
+<img src="/images/2436030584.png" alt="远程衰减性" />
+<figcaption aria-hidden="true">远程衰减性</figcaption>
+</figure>
+<p>至此，已经导出了正弦位置编码的基本形式。 总结</p>
+<ol type="1">
+<li>正弦位置编码不需要训练，具有表征位置使得Transformer能区分token顺序的作用。</li>
+<li>通过泰勒展开得到两个位置编码作用项，使两个位置编码与它们的相对位置产生关系，可以导出正弦位置编码是cos和sin的正余弦三角函数两两一组组成的绝对位置编码。</li>
+<li>通过分析远程衰减可以导出<span class="math inline">\(\theta_i =
+10000^{-2i/d}\)</span>。</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/06/13/sinusoidal%E7%AE%80%E4%BB%8B/">https://lisheng2001.github.io/2024/06/13/sinusoidal简介/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">位置编码</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/" title="基于rope长度外推方法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">基于rope长度外推方法</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/13/rope%E7%AE%80%E4%BB%8B/" title="rope简介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">rope简介</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/06/13/rope%E7%AE%80%E4%BB%8B/" title="rope简介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-13</div><div class="title">rope简介</div></div></a></div><div><a href="/2024/06/13/%E5%9F%BA%E4%BA%8Erope%E9%95%BF%E5%BA%A6%E5%A4%96%E6%8E%A8%E6%96%B9%E6%B3%95/" title="基于rope长度外推方法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-13</div><div class="title">基于rope长度外推方法</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">基本思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%AF%B9%E4%BD%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">相对位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E8%A1%B0%E5%87%8F"><span class="toc-number">2.2.</span> <span class="toc-text">远程衰减</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从滑动窗口最大值到数据结构——堆 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="BM 45 滑动窗口的最大值 url：牛客 BM45 最开始做这道题的时候我想着一个窗口里求最大值应该是没啥捷径的，就在窗口里比最大值即可。然后滑动之后就需要观察上一次的最后一个元素是不是上一个窗口的最大值，如果不是的话，就把上个窗口的最大值和当前窗口的第一个值比对，哪个大哪个就是当前窗口的最大值。如果是的话，那这个窗口的最大值就需要重新算。 实现的代码如下： 123456789101112131">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从滑动窗口最大值到数据结构——堆">
+<meta property="og:url" content="https://lisheng2001.github.io/2023/08/24/%E4%BB%8E%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC%E5%88%B0%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%A0%86/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="BM 45 滑动窗口的最大值 url：牛客 BM45 最开始做这道题的时候我想着一个窗口里求最大值应该是没啥捷径的，就在窗口里比最大值即可。然后滑动之后就需要观察上一次的最后一个元素是不是上一个窗口的最大值，如果不是的话，就把上个窗口的最大值和当前窗口的第一个值比对，哪个大哪个就是当前窗口的最大值。如果是的话，那这个窗口的最大值就需要重新算。 实现的代码如下： 123456789101112131">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2023-08-24T12:44:59.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.461Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="堆">
+<meta property="article:tag" content="数据结构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2023/08/24/%E4%BB%8E%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC%E5%88%B0%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%A0%86/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从滑动窗口最大值到数据结构——堆',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">从滑动窗口最大值到数据结构——堆</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-08-24T12:44:59.000Z" title="发表于 2023-08-24 20:44:59">2023-08-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.461Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="从滑动窗口最大值到数据结构——堆"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="bm-45-滑动窗口的最大值">BM 45 滑动窗口的最大值</h2>
+<p>url：<a
+target="_blank" rel="noopener" href="https://www.nowcoder.com/practice/1624bc35a45c42c0bc17d17fa0cba788">牛客
+BM45</a></p>
+<p>最开始做这道题的时候我想着一个窗口里求最大值应该是没啥捷径的，就在窗口里比最大值即可。然后滑动之后就需要观察上一次的最后一个元素是不是上一个窗口的最大值，如果不是的话，就把上个窗口的最大值和当前窗口的第一个值比对，哪个大哪个就是当前窗口的最大值。如果是的话，那这个窗口的最大值就需要重新算。</p>
+<p>实现的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># @param num int整型一维数组 </span></span><br><span class="line"><span class="comment"># @param size int整型 </span></span><br><span class="line"><span class="comment"># @return int整型一维数组</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">maxInWindows</span>(<span class="params">self , num: <span class="type">List</span>[<span class="built_in">int</span>], size: <span class="built_in">int</span></span>) -&gt; <span class="type">List</span>[<span class="built_in">int</span>]:</span><br><span class="line">        <span class="comment"># write code here</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(num)==<span class="number">0</span> <span class="keyword">or</span> size==<span class="number">0</span> <span class="keyword">or</span> <span class="built_in">len</span>(num) &lt; size:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        </span><br><span class="line">        result = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(num)-size+<span class="number">1</span>):</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(result) == <span class="number">0</span>:</span><br><span class="line">                result.append(<span class="built_in">max</span>(num[i: i+size]))</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                prev_window_max = result[-<span class="number">1</span>]</span><br><span class="line">                prev_val = num[i-<span class="number">1</span>]</span><br><span class="line">                <span class="keyword">if</span> prev_val != prev_window_max:</span><br><span class="line">                    <span class="keyword">if</span> prev_window_max &gt;= num[i+size-<span class="number">1</span>]:</span><br><span class="line">                        result.append(prev_window_max)</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        result.append(num[i+size-<span class="number">1</span>])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    result.append(<span class="built_in">max</span>(num[i: i+size]))</span><br><span class="line">        <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<p>这个是可以通过的。但是题解里面提到了用什么优先队列，而且似乎时间复杂度更好。我感觉有点懵。</p>
+<p>有人提到去看leetcode的题解，于是我就去Leetcode里找到了这个题目：<a
+target="_blank" rel="noopener" href="https://leetcode.cn/problems/sliding-window-maximum/description/">Leetcode
+239 滑动窗口最大值</a></p>
+<p>改了一下变量名，提交了果然Leetcode里面就过不了，超时了。之后想着应该是移除掉窗口里最大值之后要重新计算最大值很伤，记录次大值应该能缓解这个问题。但思考了一下，如果size是1啥的，这个次大值还得额外作为一个分支维护，很麻烦。</p>
+<p>然后我就开始看优先队列的解法，之后发现看得迷迷糊糊的。后面查了资料原来优先队列是基于堆的，正好堆排序啥的已经忘得差不多了，借此机会也重新熟悉一下数据结构——堆。</p>
+<h2 id="堆">堆</h2>
+<h3 id="堆的定义">堆的定义</h3>
+<p>首先堆一定是一颗完全二叉树，完全二叉树的定义是：若二叉树的深度为
+h，除第 h 层外，其它各层的结点数都达到最大个数，第 h
+层所有的叶子结点都连续集中在最左边，这就是完全二叉树（第 h 层可能包含
+[1~2h] 个节点）。</p>
+<p>完全二叉树通俗来理解就是二叉树最后一层可以不是满的，但所有节点都必须靠左排列。这提供了一个重要性质，就是知道层序遍历就可以重建这棵树，这为后面使用数组来表示这个完全二叉树奠定基础。使用数组而不是节点的left和right指针访问二叉树还带来一个好处，就是可以通过子节点位置访问父节点，而无需引入任何额外表示。比如位置是<span
+class="math inline">\(k\)</span>的节点其父节点的位置为<span
+class="math inline">\(\lfloor \frac{k-1}{2}
+\rfloor\)</span>。同样如果知道父节点位置为<span
+class="math inline">\(i\)</span>，则两个子节点的位置为<span
+class="math inline">\(2i+1\)</span>和<span
+class="math inline">\(2i+2\)</span>。</p>
+<p>接下来来介绍堆的有序性。根据父节点和两个子节点的关系，可以分为大根堆和小根堆。顾名思义，前者就是根节点大于左右子节点，后者就是根节点小于左右子节点。如下图所示：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart TD
+	subgraph 小根堆
+	A[小] --&gt; B[大]
+	A --&gt; C[大]
+	end
+	
+	subgraph 大根堆
+	D[大] --&gt; F[小]
+	D --&gt; E[小]
+	end
+  </pre></div>
+<p>实际上大根堆和小根堆效果是类似的，只是比较的方向不同而已。为了简单起见，采用《算法（第4版）》堆有序的定义（即大根堆定义）。</p>
+<blockquote>
+<p>堆有序：当一颗二叉树的每个节点都大于等于它的两个子节点时，它被称为堆有序</p>
+</blockquote>
+<p>此时，根节点应该时堆有序的二叉树中的最大节点。</p>
+<p>知道了完全二叉树和堆有序的概念之后，可以导出堆的概念了：</p>
+<blockquote>
+<p>堆：堆是一组能够用堆有序的完全二叉树排序的元素，并在数组中按层次遍历顺序储存。</p>
+</blockquote>
+<h3 id="堆的核心操作">堆的核心操作</h3>
+<p>从定义我们可以知道堆的特征就是根元素最大，然后每个子树都满足根元素大于左右子树节点，并且堆构成的二叉树是完全二叉树。我们接下来介绍堆的两个核心操作：上浮（自底向下的堆有序化）和下沉（由上至下的堆有序化），通过这两个核心操作我们可以实现向堆中插入元素和弹出堆中最大元素（弹出后保持剩余元素仍然满足堆定义）。</p>
+<blockquote>
+<p>堆有序化：对堆进行一些简单的改动，打破堆的状态，然后再遍历堆并按照要求将堆的状态恢复。</p>
+</blockquote>
+<h4 id="上浮-自底向下的堆有序化">上浮 自底向下的堆有序化</h4>
+<p>如果堆的有序状态因为某个节点变得比它的父节点更大而打破，那么就需要通过交换它和它的父节点来修复堆。交换之后这个节点仍然可能比它的父节点更大，那我们就重复这个过程知道它浮到合适的位置。代码为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">swim</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], k: <span class="built_in">int</span></span>):</span><br><span class="line">    <span class="comment"># 如果已经浮到顶了就退出</span></span><br><span class="line">    <span class="keyword">if</span> k == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 比较目标节点和它的父节点</span></span><br><span class="line">    <span class="keyword">if</span> nums[k] &gt; nums[(k-<span class="number">1</span>)//<span class="number">2</span>]:</span><br><span class="line">        <span class="comment"># 交换父子节点并进入下一轮比较</span></span><br><span class="line">        nums[k], nums[(k-<span class="number">1</span>)//<span class="number">2</span>] = nums[(k-<span class="number">1</span>)//<span class="number">2</span>], nums[k]</span><br><span class="line">        swim(nums, (k-<span class="number">1</span>)//<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="下沉-由上至下的堆有序化">下沉 由上至下的堆有序化</h4>
+<p>如果堆的有序状态被某个节点变得比它的两个子节点或是其中之一更小而被打破了，那么可以将它和它的两个子节点中较大者交换来恢复堆。交换之后该节点可能比子节点的子节点还小，重复这个过程直到这个节点比子节点都大或者沉到最底层。代码为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sink</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], k: <span class="built_in">int</span>, N=<span class="literal">None</span></span>):</span><br><span class="line">    N = <span class="built_in">len</span>(nums) <span class="keyword">if</span> N <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> N</span><br><span class="line">    <span class="comment"># 获取左右子节点位置</span></span><br><span class="line">    left_node_pos = <span class="number">2</span>*k + <span class="number">1</span></span><br><span class="line">    right_node_pos = <span class="number">2</span>*k + <span class="number">2</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> right_node_pos &lt; N:</span><br><span class="line">        <span class="comment"># 这里是左右子节点都在，正常比较即可</span></span><br><span class="line">        <span class="keyword">if</span> nums[left_node_pos] &gt; nums[right_node_pos] <span class="keyword">and</span> nums[left_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[left_node_pos], nums[k] = nums[k], nums[left_node_pos]</span><br><span class="line">            sink(nums, left_node_pos, N)</span><br><span class="line">        <span class="keyword">elif</span> nums[right_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[right_node_pos], nums[k] = nums[k], nums[right_node_pos]</span><br><span class="line">            sink(nums, right_node_pos, N)</span><br><span class="line">    <span class="keyword">elif</span> left_node_pos &lt; N:</span><br><span class="line">        <span class="comment"># 这里是只有左节点</span></span><br><span class="line">        <span class="keyword">if</span> nums[left_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[left_node_pos], nums[k] = nums[k], nums[left_node_pos]</span><br><span class="line">            sink(nums, left_node_pos, N)</span><br><span class="line">    <span class="comment"># 如果左右子节点都没有那就是沉到底了，不管了</span></span><br></pre></td></tr></table></figure>
+<p>实现了上浮和下沉后，我们可以实现插入元素和删除最大元素了。</p>
+<h4 id="插入元素">插入元素</h4>
+<p>插入元素首先是不要破坏堆里完全二叉树的结构，其次是要将插入的元素上浮到合理位置。要想不破坏原来二叉树结构很简单，直接在数组末尾新增一个位置放新元素即可，之后通过上浮操作将新元素交换到合理位置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">insert_to_maxHeap</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], node: <span class="built_in">int</span></span>):</span><br><span class="line">    N = <span class="built_in">len</span>(nums)</span><br><span class="line">    nums.append(node)</span><br><span class="line">    <span class="comment"># 上浮到合理位置</span></span><br><span class="line">    swim(nums, N)</span><br></pre></td></tr></table></figure>
+<h4 id="弹出堆顶元素弹出最大元素">弹出堆顶元素（弹出最大元素）</h4>
+<p>同样，弹出堆顶元素也要同时保证弹出后树仍然是完全二叉树，而且剩下的元素都在合理位置。可以将最底层最后的元素与根节点交换位置，并弹出根节点。此时将新的根节点通过下沉操作重新将堆有序化即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">pop_max_val</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    N = <span class="built_in">len</span>(nums)</span><br><span class="line">    nums[<span class="number">0</span>], nums[N-<span class="number">1</span>] = nums[N-<span class="number">1</span>], nums[<span class="number">0</span>]</span><br><span class="line">    target = nums.pop()</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(nums) &gt; <span class="number">0</span>:</span><br><span class="line">    	sink(nums, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> target</span><br></pre></td></tr></table></figure>
+<p>上浮只需要不超过<span class="math inline">\(\log_2 N
++1\)</span>次的比较，而下沉需要不超过<span
+class="math inline">\(2\log_2N\)</span>次的比较。后面的插入元素和弹出元素都依赖于上浮或下沉，因此这4种操作的时间复杂度均为<span
+class="math inline">\(O(\log N)\)</span>。</p>
+<h3 id="堆的构造和堆排序">堆的构造和堆排序</h3>
+<h4 id="堆的构造">堆的构造</h4>
+<p>如果由N个给定元素构造一个堆有什么高效的方法吗？</p>
+<p>一种方法是先构建一个空堆，然后将N个元素依次插入堆中，每次插入最坏需要<span
+class="math inline">\(O(\log
+N)\)</span>的复杂度，要插入N次，总复杂度为<span
+class="math inline">\(O(N\log N)\)</span>。</p>
+<p>另一种方法是从右到左使用下沉来构造子堆。因为如果左右子树都已经是堆了，那堆父节点使用下沉操作就可以将这棵树变为堆。之后，这棵树又可以作为新的已经堆有序的子树，对父节点的父节点使用下沉操作形成一个新堆。这种方法的妙处在于堆大小是1，也即没有子节点的元素都可以跳过！父节点的位置为<span
+class="math inline">\(i\)</span>的话，两个子节点的位置分别为<span
+class="math inline">\(2i+1\)</span>和<span
+class="math inline">\(2i+2\)</span>，假设<span
+class="math inline">\(2i+1\)</span>位置超过数组长度，那么第<span
+class="math inline">\(i\)</span>个位置的节点可以跳过。这意味着有一半左右的节点是可以跳过的，只需要对位置不超过<span
+class="math inline">\(\lfloor \frac{N}{2}
+\rfloor\)</span>的元素调用下沉方法即可。但注意要从右向左执行这个操作，因为我们要优先保证执行下沉时左右子树都已经是堆了。当然，我们也可以粗略地计算一些复杂度，对<span
+class="math inline">\(\frac{N}{2}\)</span>个元素执行下沉操作，下沉操作最坏需要<span
+class="math inline">\(O(\log N)\)</span>的复杂度，因此总复杂度也为<span
+class="math inline">\(O(N \log
+N)\)</span>。虽然复杂度没有改善，但是从上面的讨论也可以知道这种方法比前一种需要比较的元素更少，更加高效。</p>
+<p>后一种方法的Python实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">build_heap</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;根据任意给定的数组nums构建堆&#x27;&#x27;&#x27;</span></span><br><span class="line">    pos = <span class="built_in">len</span>(nums) // <span class="number">2</span></span><br><span class="line">    <span class="keyword">while</span> pos &gt;= <span class="number">0</span>:</span><br><span class="line">        sink(nums, pos)</span><br><span class="line">        pos -= <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h4 id="堆排序">堆排序</h4>
+<p>堆的构造过程中，将无序的数组变得堆有序了。那现在依次调用删除最大元素的方法把元素从右到左地取出来，就可以对整个数组完成排序了。堆的构造需要<span
+class="math inline">\(O(N\log
+N)\)</span>的复杂度，删除最大元素每次需要<span
+class="math inline">\(O(\log N)\)</span>，要操作N次，复杂度也为<span
+class="math inline">\(O(N \log N)\)</span>。因此堆排序的复杂度为<span
+class="math inline">\(O(N \log N)\)</span>。</p>
+<p>我们可以实现这样的操作：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sort_by_heap_v0</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;堆排序，先构建堆，之后依次弹出&#x27;&#x27;&#x27;</span></span><br><span class="line">    build_heap(nums)</span><br><span class="line">    result = [-<span class="number">1</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums))]</span><br><span class="line">    pos = <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> pos &gt;= <span class="number">0</span>:</span><br><span class="line">        result[pos] = pop_max_val(nums)</span><br><span class="line">        pos -= <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<p>当然，要新申请一个result数组很扎眼。我们可以思考一件事，就是从长度为<span
+class="math inline">\(N\)</span>堆有序的数组里弹出一个元素时，这个元素恰好是排序好的数组中的第<span
+class="math inline">\(N\)</span>个元素。也就是说如果我们在删除最大元素时将最大元素移到末尾，实际上已经把这个元素放到正确的位置上了。这时候只需要对被交换上去的元素进行下沉操作，然后收缩堆的范围，就已经排好一个元素并保持了前<span
+class="math inline">\(N-1\)</span>个元素的堆有序状态了。我们实现一下这个操作（下沉排序）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sort_by_heap</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;堆排序，但在原数组上完成操作&#x27;&#x27;&#x27;</span></span><br><span class="line">    build_heap(nums)</span><br><span class="line">    pos = <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> pos &gt; <span class="number">0</span>:  <span class="comment"># 剩一个数时实际已经完成排序了</span></span><br><span class="line">        nums[<span class="number">0</span>], nums[pos] = nums[pos], nums[<span class="number">0</span>]</span><br><span class="line">        sink(nums, <span class="number">0</span>, pos)  <span class="comment"># 只需要下沉数组的前N-1个数了</span></span><br><span class="line">        pos -= <span class="number">1</span></span><br><span class="line">	<span class="keyword">return</span> nums</span><br></pre></td></tr></table></figure>
+<p>堆排序的测试代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sink</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], k: <span class="built_in">int</span>, N=<span class="literal">None</span></span>):</span><br><span class="line">    N = <span class="built_in">len</span>(nums) <span class="keyword">if</span> N <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> N</span><br><span class="line">    <span class="comment"># 获取左右子节点位置</span></span><br><span class="line">    left_node_pos = <span class="number">2</span>*k + <span class="number">1</span></span><br><span class="line">    right_node_pos = <span class="number">2</span>*k + <span class="number">2</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> right_node_pos &lt; N:</span><br><span class="line">        <span class="comment"># 这里是左右子节点都在，正常比较即可</span></span><br><span class="line">        <span class="keyword">if</span> nums[left_node_pos] &gt; nums[right_node_pos] <span class="keyword">and</span> nums[left_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[left_node_pos], nums[k] = nums[k], nums[left_node_pos]</span><br><span class="line">            sink(nums, left_node_pos, N)</span><br><span class="line">        <span class="keyword">elif</span> nums[right_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[right_node_pos], nums[k] = nums[k], nums[right_node_pos]</span><br><span class="line">            sink(nums, right_node_pos, N)</span><br><span class="line">    <span class="keyword">elif</span> left_node_pos &lt; N:</span><br><span class="line">        <span class="comment"># 这里是只有左节点</span></span><br><span class="line">        <span class="keyword">if</span> nums[left_node_pos] &gt; nums[k]:</span><br><span class="line">            nums[left_node_pos], nums[k] = nums[k], nums[left_node_pos]</span><br><span class="line">            sink(nums, left_node_pos, N)</span><br><span class="line">    <span class="comment"># 如果左右子节点都没有那就是沉到底了，不管了</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_heap</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;根据任意给定的数组nums构建堆&#x27;&#x27;&#x27;</span></span><br><span class="line">    pos = <span class="built_in">len</span>(nums) // <span class="number">2</span></span><br><span class="line">    <span class="keyword">while</span> pos &gt;= <span class="number">0</span>:</span><br><span class="line">        sink(nums, pos)</span><br><span class="line">        pos -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sort_by_heap</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;堆排序，但在原数组上完成操作&#x27;&#x27;&#x27;</span></span><br><span class="line">    build_heap(nums)</span><br><span class="line">    pos = <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> pos &gt; <span class="number">0</span>:  <span class="comment"># 剩一个数时实际已经完成排序了</span></span><br><span class="line">        nums[<span class="number">0</span>], nums[pos] = nums[pos], nums[<span class="number">0</span>]</span><br><span class="line">        sink(nums, <span class="number">0</span>, pos)  <span class="comment"># 只需要下沉数组的前N-1个数了</span></span><br><span class="line">        pos -= <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> nums</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a = [<span class="number">9</span>, <span class="number">7</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">8</span>]</span><br><span class="line">sort_by_heap(a)</span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"><span class="comment"># result: [1, 2, 3, 4, 5, 6, 7, 8, 9]</span></span><br></pre></td></tr></table></figure>
+<h3 id="用python实现一个堆">用Python实现一个堆</h3>
+<p>综合上述代码，并且使用面向对象的方式可以自己实现一个堆。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 大根堆实现</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MaxHeap</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, nums=<span class="literal">None</span></span>):</span><br><span class="line">        self.nums = [] <span class="keyword">if</span> nums <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> nums</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(self.nums) &gt; <span class="number">0</span>:</span><br><span class="line">            self.build_heap()</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_heap</span>(<span class="params">self</span>):</span><br><span class="line">        pos = <span class="built_in">len</span>(self.nums) // <span class="number">2</span></span><br><span class="line">        <span class="keyword">while</span> pos &gt;= <span class="number">0</span>:</span><br><span class="line">            self.sink(pos)</span><br><span class="line">            pos -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">swim</span>(<span class="params">self, k: <span class="built_in">int</span></span>):</span><br><span class="line">        <span class="keyword">if</span> k &gt; <span class="number">0</span> <span class="keyword">and</span> self.nums[k] &gt; self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>]:</span><br><span class="line">            <span class="comment"># 交换父子节点并进入下一轮比较</span></span><br><span class="line">            self.nums[k], self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>] = self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>], self.nums[k]</span><br><span class="line">            self.swim((k-<span class="number">1</span>)//<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">sink</span>(<span class="params">self, k:<span class="built_in">int</span>, N=<span class="literal">None</span></span>):</span><br><span class="line">        N = <span class="built_in">len</span>(self.nums) <span class="keyword">if</span> N <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> N</span><br><span class="line">        <span class="comment"># 获取左右子节点位置</span></span><br><span class="line">        left_node_pos = <span class="number">2</span>*k + <span class="number">1</span></span><br><span class="line">        right_node_pos = <span class="number">2</span>*k + <span class="number">2</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> right_node_pos &lt; N:</span><br><span class="line">            <span class="comment"># 这里是左右子节点都在，正常比较即可</span></span><br><span class="line">            <span class="keyword">if</span> self.nums[left_node_pos] &gt; self.nums[right_node_pos] <span class="keyword">and</span> self.nums[left_node_pos] &gt; self.nums[k]:</span><br><span class="line">                self.nums[left_node_pos], self.nums[k] = self.nums[k], self.nums[left_node_pos]</span><br><span class="line">                self.sink(left_node_pos, N)</span><br><span class="line">            <span class="keyword">elif</span> self.nums[right_node_pos] &gt; self.nums[k]:</span><br><span class="line">                self.nums[right_node_pos], self.nums[k] = self.nums[k], self.nums[right_node_pos]</span><br><span class="line">                self.sink(right_node_pos, N)</span><br><span class="line">        <span class="keyword">elif</span> left_node_pos &lt; N:</span><br><span class="line">        <span class="comment"># 这里是只有左节点</span></span><br><span class="line">            <span class="keyword">if</span> self.nums[left_node_pos] &gt; self.nums[k]:</span><br><span class="line">                self.nums[left_node_pos], self.nums[k] = self.nums[k], self.nums[left_node_pos]</span><br><span class="line">                self.sink(left_node_pos, N)</span><br><span class="line">        <span class="comment"># 如果左右子节点都没有那就是沉到底了，不管了</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">insert</span>(<span class="params">self, node</span>):</span><br><span class="line">        N = <span class="built_in">len</span>(self.nums)</span><br><span class="line">        self.nums.append(node)</span><br><span class="line">        <span class="comment"># 上浮到合理位置</span></span><br><span class="line">        self.swim(N)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pop</span>(<span class="params">self</span>):</span><br><span class="line">        N = <span class="built_in">len</span>(self.nums)</span><br><span class="line">        self.nums[<span class="number">0</span>], self.nums[N-<span class="number">1</span>] = self.nums[N-<span class="number">1</span>], self.nums[<span class="number">0</span>]</span><br><span class="line">        target = self.nums.pop()</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(self.nums) &gt; <span class="number">0</span>:</span><br><span class="line">            self.sink(<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> target</span><br></pre></td></tr></table></figure>
+<h3 id="堆的应用优先队列">堆的应用——优先队列</h3>
+<p>可以借助堆来实现优先队列。优先队列有两个具体操作：</p>
+<ol type="1">
+<li>插入元素到队列</li>
+<li>弹出最小元素</li>
+</ol>
+<p>可以用小根堆来实现。</p>
+<h3 id="堆的fqa">堆的FQA</h3>
+<p>本部分来自《算法（第4版）》的优先队列章节的答疑部分。</p>
+<p>Q:
+为什么要使用堆结构？为什么我们不直接把元素排序然后再一个个引用有序数组中的元素？</p>
+<p>A:
+在某些数据处理的例子中，数据总量很大，无法排序甚至无法装进内存。如果我们需要从10亿个元素中选出最小的10个，那么对这个数组排序显然不是好办法，但有了堆，就可以每次删除最大的元素并加入新元素即可。</p>
+<p>Q:
+在堆排序中构造堆时，逐个向堆中添加元素比由底向上的复杂方法更简单。为什么要这么做？</p>
+<p>A: 对于一个排序算法来说，这么做能够快上
+20%，而且所需的代码更少（不会用到 swim
+函数）。理解算法的难度并不一定与它的简洁性或者效率相关。</p>
+<p>Q: 在Python中使用堆/优先队列需要自己实现上述操作吗？</p>
+<p>A:
+实际不需要，因为Python内置了<code>heapq</code>库来完成堆的操作。具体用例如下：</p>
+<p>用<code>heapq</code>进行堆排序：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">heapsort</span>(<span class="params">iterable</span>):</span><br><span class="line">    h = []</span><br><span class="line">    <span class="keyword">for</span> value <span class="keyword">in</span> iterable:</span><br><span class="line">        heappush(h, value)</span><br><span class="line">    <span class="keyword">return</span> [heappop(h) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(h))]</span><br><span class="line"></span><br><span class="line">heapsort([<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
+<p>借助<code>heapq</code>实现优先队列，甚至通过一个字典使其支持移除任务：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">pq = []                         <span class="comment"># list of entries arranged in a heap</span></span><br><span class="line">entry_finder = &#123;&#125;               <span class="comment"># mapping of tasks to entries</span></span><br><span class="line">REMOVED = <span class="string">&#x27;&lt;removed-task&gt;&#x27;</span>      <span class="comment"># placeholder for a removed task</span></span><br><span class="line">counter = itertools.count()     <span class="comment"># unique sequence count</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add_task</span>(<span class="params">task, priority=<span class="number">0</span></span>):</span><br><span class="line">    <span class="string">&#x27;Add a new task or update the priority of an existing task&#x27;</span></span><br><span class="line">    <span class="keyword">if</span> task <span class="keyword">in</span> entry_finder:</span><br><span class="line">        remove_task(task)</span><br><span class="line">    count = <span class="built_in">next</span>(counter)</span><br><span class="line">    entry = [priority, count, task]</span><br><span class="line">    entry_finder[task] = entry</span><br><span class="line">    heappush(pq, entry)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove_task</span>(<span class="params">task</span>):</span><br><span class="line">    <span class="string">&#x27;Mark an existing task as REMOVED.  Raise KeyError if not found.&#x27;</span></span><br><span class="line">    entry = entry_finder.pop(task)</span><br><span class="line">    entry[-<span class="number">1</span>] = REMOVED</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pop_task</span>():</span><br><span class="line">    <span class="string">&#x27;Remove and return the lowest priority task. Raise KeyError if empty.&#x27;</span></span><br><span class="line">    <span class="keyword">while</span> pq:</span><br><span class="line">        priority, count, task = heappop(pq)</span><br><span class="line">        <span class="keyword">if</span> task <span class="keyword">is</span> <span class="keyword">not</span> REMOVED:</span><br><span class="line">            <span class="keyword">del</span> entry_finder[task]</span><br><span class="line">            <span class="keyword">return</span> task</span><br><span class="line">    <span class="keyword">raise</span> KeyError(<span class="string">&#x27;pop from an empty priority queue&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="回到bm-45">回到BM 45</h2>
+<p>那有了堆的知识，我们可以用大根堆完成寻找滑动窗口最大值。需要注意的是，大根堆加入元素和弹出最大元素是<span
+class="math inline">\(O(\log
+n)\)</span>的复杂度的，但是要删除某个特定的元素却需要遍历整颗树，即<span
+class="math inline">\(O(n)\)</span>复杂度。所以当滑动窗口移动时，并不好直接删除移出滑动窗口的元素。我们可以借鉴<code>heapq</code>中移除任务的方法，对移出滑动窗口的元素进行标记，如果是已经移除了的，就丢掉再pop一次，直到获得滑动窗口内的最大值。用下标能很快判断该元素是否在滑动窗口内，因此我们创建一个包装类，该类比较大小采用<code>value</code>字段比较大小，而附带一个<code>index</code>字段用来记录原来的位置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">WrapItem</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, value, index</span>):</span><br><span class="line">        self.value = value</span><br><span class="line">        self.index = index</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__lt__</span>(<span class="params">self, other: WrapItem</span>):</span><br><span class="line">        <span class="comment"># 实现less than方法用于比较对象大小</span></span><br><span class="line">        <span class="keyword">return</span> self.value &lt; other.value</span><br></pre></td></tr></table></figure>
+<p>组合上面的大根堆和本章的包装类，就可以出来解决方案了。完整代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># @param num int整型一维数组 </span></span><br><span class="line"><span class="comment"># @param size int整型 </span></span><br><span class="line"><span class="comment"># @return int整型一维数组</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">WrapItem</span>:</span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, value, index</span>):</span><br><span class="line">            self.value = value</span><br><span class="line">            self.index = index</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">__lt__</span>(<span class="params">self, other</span>):</span><br><span class="line">            <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">MaxHeap</span>:</span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, nums=<span class="literal">None</span></span>):</span><br><span class="line">            self.nums = [] <span class="keyword">if</span> nums <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> nums</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(self.nums) &gt; <span class="number">0</span>:</span><br><span class="line">                self.build_heap()</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">build_heap</span>(<span class="params">self</span>):</span><br><span class="line">            pos = <span class="built_in">len</span>(self.nums) // <span class="number">2</span></span><br><span class="line">            <span class="keyword">while</span> pos &gt;= <span class="number">0</span>:</span><br><span class="line">                self.sink(pos)</span><br><span class="line">                pos -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">swim</span>(<span class="params">self, k: <span class="built_in">int</span></span>):</span><br><span class="line">            <span class="keyword">if</span> k &gt; <span class="number">0</span> <span class="keyword">and</span> self.nums[k] &gt; self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>]:</span><br><span class="line">                <span class="comment"># 交换父子节点并进入下一轮比较</span></span><br><span class="line">                self.nums[k], self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>] = self.nums[(k-<span class="number">1</span>)//<span class="number">2</span>], self.nums[k]</span><br><span class="line">                self.swim((k-<span class="number">1</span>)//<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">sink</span>(<span class="params">self, k:<span class="built_in">int</span>, N=<span class="literal">None</span></span>):</span><br><span class="line">            N = <span class="built_in">len</span>(self.nums) <span class="keyword">if</span> N <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> N</span><br><span class="line">            <span class="comment"># 获取左右子节点位置</span></span><br><span class="line">            left_node_pos = <span class="number">2</span>*k + <span class="number">1</span></span><br><span class="line">            right_node_pos = <span class="number">2</span>*k + <span class="number">2</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> right_node_pos &lt; N:</span><br><span class="line">                <span class="comment"># 这里是左右子节点都在，正常比较即可</span></span><br><span class="line">                <span class="keyword">if</span> self.nums[left_node_pos] &gt; self.nums[right_node_pos] <span class="keyword">and</span> self.nums[left_node_pos] &gt; self.nums[k]:</span><br><span class="line">                    self.nums[left_node_pos], self.nums[k] = self.nums[k], self.nums[left_node_pos]</span><br><span class="line">                    self.sink(left_node_pos, N)</span><br><span class="line">                <span class="keyword">elif</span> self.nums[right_node_pos] &gt; self.nums[k]:</span><br><span class="line">                    self.nums[right_node_pos], self.nums[k] = self.nums[k], self.nums[right_node_pos]</span><br><span class="line">                    self.sink(right_node_pos, N)</span><br><span class="line">            <span class="keyword">elif</span> left_node_pos &lt; N:</span><br><span class="line">            <span class="comment"># 这里是只有左节点</span></span><br><span class="line">                <span class="keyword">if</span> self.nums[left_node_pos] &gt; self.nums[k]:</span><br><span class="line">                    self.nums[left_node_pos], self.nums[k] = self.nums[k], self.nums[left_node_pos]</span><br><span class="line">                    self.sink(left_node_pos, N)</span><br><span class="line">            <span class="comment"># 如果左右子节点都没有那就是沉到底了，不管了</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">insert</span>(<span class="params">self, node</span>):</span><br><span class="line">            N = <span class="built_in">len</span>(self.nums)</span><br><span class="line">            self.nums.append(node)</span><br><span class="line">            <span class="comment"># 上浮到合理位置</span></span><br><span class="line">            self.swim(N)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">pop</span>(<span class="params">self</span>):</span><br><span class="line">            N = <span class="built_in">len</span>(self.nums)</span><br><span class="line">            self.nums[<span class="number">0</span>], self.nums[N-<span class="number">1</span>] = self.nums[N-<span class="number">1</span>], self.nums[<span class="number">0</span>]</span><br><span class="line">            target = self.nums.pop()</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(self.nums) &gt; <span class="number">0</span>:</span><br><span class="line">                self.sink(<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> target</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">getMax</span>(<span class="params">self</span>):</span><br><span class="line">            <span class="keyword">return</span> self.nums[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">maxInWindows</span>(<span class="params">self , num: <span class="type">List</span>[<span class="built_in">int</span>], size: <span class="built_in">int</span></span>) -&gt; <span class="type">List</span>[<span class="built_in">int</span>]:</span><br><span class="line">        <span class="comment"># write code here</span></span><br><span class="line">        <span class="comment"># 去除边界条件</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(num) == <span class="number">0</span> <span class="keyword">or</span> size == <span class="number">0</span> <span class="keyword">or</span> <span class="built_in">len</span>(num) &lt; size:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line">        <span class="comment"># 初始化大根堆</span></span><br><span class="line">        heap = Solution.MaxHeap([Solution.WrapItem(v, i) <span class="keyword">for</span> i, v <span class="keyword">in</span> <span class="built_in">enumerate</span>(num[:size])])</span><br><span class="line">        result = [heap.getMax().value]</span><br><span class="line">        <span class="comment"># 向前移动直到完成</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(size, <span class="built_in">len</span>(num)):</span><br><span class="line">            <span class="comment"># 加入新的节点</span></span><br><span class="line">            heap.insert(Solution.WrapItem(num[i], i))</span><br><span class="line">            <span class="comment"># 取出最大值</span></span><br><span class="line">            target = heap.getMax()</span><br><span class="line">            <span class="comment"># 过滤掉不在窗口内的最大值</span></span><br><span class="line">            <span class="keyword">while</span> target.index &lt; i-size+<span class="number">1</span>:</span><br><span class="line">                heap.pop()</span><br><span class="line">                target = heap.getMax()</span><br><span class="line">            <span class="comment"># 加入结果中</span></span><br><span class="line">            result.append(target.value)</span><br><span class="line">        <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<p>稍微改改参数，可以通过leetcode上239题的提交了。提交的结果为：</p>
+<figure>
+<img src="/images/image-20230825163054303.png"
+alt="image-20230825163054303" />
+<figcaption aria-hidden="true">image-20230825163054303</figcaption>
+</figure>
+<p>我们也可以用Python内置的<code>heapq</code>使用更少的代码完成提交：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment"># @param num int整型一维数组 </span></span><br><span class="line"><span class="comment"># @param size int整型 </span></span><br><span class="line"><span class="comment"># @return int整型一维数组</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">maxInWindows</span>(<span class="params">self , num: <span class="type">List</span>[<span class="built_in">int</span>], size: <span class="built_in">int</span></span>) -&gt; <span class="type">List</span>[<span class="built_in">int</span>]:</span><br><span class="line">        <span class="comment"># write code here</span></span><br><span class="line">        <span class="comment"># 去除边界条件</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(num) == <span class="number">0</span> <span class="keyword">or</span> size == <span class="number">0</span> <span class="keyword">or</span> <span class="built_in">len</span>(num) &lt; size:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line">        <span class="comment"># 初始化堆，注意heapq的默认实现为小根堆，因此加入时值乘-1当作大根堆用</span></span><br><span class="line">        heap = [(-<span class="number">1</span> * v, i) <span class="keyword">for</span> i, v <span class="keyword">in</span> <span class="built_in">enumerate</span>(num[:size])]</span><br><span class="line">        heapq.heapify(heap)</span><br><span class="line">        result = [heap[<span class="number">0</span>][<span class="number">0</span>] * -<span class="number">1</span>]</span><br><span class="line">        <span class="comment"># 步进，直到滑动完</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(size, <span class="built_in">len</span>(num)):</span><br><span class="line">            <span class="comment"># 加入新节点</span></span><br><span class="line">            heapq.heappush(heap, (-<span class="number">1</span> * num[i], i))</span><br><span class="line">            target = heap[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">while</span> target[<span class="number">1</span>] &lt; i-size+<span class="number">1</span>:</span><br><span class="line">                heapq.heappop(heap)</span><br><span class="line">                target = heap[<span class="number">0</span>]</span><br><span class="line">            result.append(target[<span class="number">0</span>] * -<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<p>代码简洁很多很多了！而且根据Leetcode上的提交结果也变快变得更省内存了。</p>
+<figure>
+<img src="/images/image-20230825164727332.png"
+alt="image-20230825164727332" />
+<figcaption aria-hidden="true">image-20230825164727332</figcaption>
+</figure>
+<p>时间从4192ms到608ms，还挺夸张的，而且heapq也是纯Python实现，内存方面倒是没有太大不同。时间上的差距应该是我在实现堆的时候用了递归方法而不是非递归循环，这里对性能影响可能比较大。</p>
+<h2 id="小结">小结</h2>
+<p>Anyway, 总算是给这章写完了。小结一下学到的东西吧：</p>
+<ol type="1">
+<li>堆是一种插入和弹出最大/最小元素高效的结构，是优先队列的基础数据结构。</li>
+<li>堆的两个核心操作是上浮和下沉，借助这两个核心操作我们可以高效地向堆中插入元素和向堆中弹出最值元素。</li>
+<li>堆适合于数据量巨大的情况下的最大值或最大的前M项问题，它可以用可接受的空间流式地处理完所有数据。但它不擅长删除某个特定元素，因此我们可能需要一些辅助的数据结构来帮助堆标记已经删除掉的节点。</li>
+<li>在Python中，结合列表和heapq库可以很方便地使用堆。</li>
+</ol>
+<h2 id="参考资料">参考资料</h2>
+<ol type="1">
+<li>《算法（第4版）》</li>
+<li>B站视频：<a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1AF411G7cA">【从堆的定义到优先队列、堆排序】
+10分钟看懂必考的数据结构——堆</a></li>
+<li>Python文档：<a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/heapq.html">heapq ---
+堆队列算法</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2023/08/24/%E4%BB%8E%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC%E5%88%B0%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E5%A0%86/">https://lisheng2001.github.io/2023/08/24/从滑动窗口最大值到数据结构——堆/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A0%86/">堆</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/08/25/20230825%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230825刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">20230825刷题近况</div></div></a></div><div class="next-post pull-right"><a href="/2023/08/23/20230823%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230823刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">20230823刷题近况</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/08/25/20230825%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230825刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-25</div><div class="title">20230825刷题近况</div></div></a></div><div><a href="/2023/09/08/20230908%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230908刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-08</div><div class="title">20230908刷题近况</div></div></a></div><div><a href="/2023/08/18/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" title="二叉树的遍历"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-18</div><div class="title">二叉树的遍历</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#bm-45-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC"><span class="toc-number">1.</span> <span class="toc-text">BM 45 滑动窗口的最大值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86"><span class="toc-number">2.</span> <span class="toc-text">堆</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">2.1.</span> <span class="toc-text">堆的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C"><span class="toc-number">2.2.</span> <span class="toc-text">堆的核心操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E6%B5%AE-%E8%87%AA%E5%BA%95%E5%90%91%E4%B8%8B%E7%9A%84%E5%A0%86%E6%9C%89%E5%BA%8F%E5%8C%96"><span class="toc-number">2.2.1.</span> <span class="toc-text">上浮 自底向下的堆有序化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E6%B2%89-%E7%94%B1%E4%B8%8A%E8%87%B3%E4%B8%8B%E7%9A%84%E5%A0%86%E6%9C%89%E5%BA%8F%E5%8C%96"><span class="toc-number">2.2.2.</span> <span class="toc-text">下沉 由上至下的堆有序化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%92%E5%85%A5%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.3.</span> <span class="toc-text">插入元素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%B9%E5%87%BA%E5%A0%86%E9%A1%B6%E5%85%83%E7%B4%A0%E5%BC%B9%E5%87%BA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.4.</span> <span class="toc-text">弹出堆顶元素（弹出最大元素）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="toc-number">2.3.</span> <span class="toc-text">堆的构造和堆排序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E6%9E%84%E9%80%A0"><span class="toc-number">2.3.1.</span> <span class="toc-text">堆的构造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="toc-number">2.3.2.</span> <span class="toc-text">堆排序</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8python%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E5%A0%86"><span class="toc-number">2.4.</span> <span class="toc-text">用Python实现一个堆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%BA%94%E7%94%A8%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97"><span class="toc-number">2.5.</span> <span class="toc-text">堆的应用——优先队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84fqa"><span class="toc-number">2.6.</span> <span class="toc-text">堆的FQA</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E5%88%B0bm-45"><span class="toc-number">3.</span> <span class="toc-text">回到BM 45</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

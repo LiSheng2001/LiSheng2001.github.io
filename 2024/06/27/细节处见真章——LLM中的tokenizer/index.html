@@ -1,0 +1,387 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>细节处见真章——LLM中的tokenizer | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="在大语言模型中，tokenizer（分词器）是一个非常关键的组件。它的主要功能是将输入的文本数据转换为模型能够处理的格式，通常是一个序列的token（标记）。具体来说，tokenizer将文本分割成较小的单位，通常是单词、子词或字符，这些单位称为token。 tokenizer的特征 tokenizer的作用非常直观，就是将文本分割成一系列token。好的tokenizer应该具备两个特征： 1.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="细节处见真章——LLM中的tokenizer">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="在大语言模型中，tokenizer（分词器）是一个非常关键的组件。它的主要功能是将输入的文本数据转换为模型能够处理的格式，通常是一个序列的token（标记）。具体来说，tokenizer将文本分割成较小的单位，通常是单词、子词或字符，这些单位称为token。 tokenizer的特征 tokenizer的作用非常直观，就是将文本分割成一系列token。好的tokenizer应该具备两个特征： 1.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-06-27T12:11:31.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.463Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="大语言模型">
+<meta property="article:tag" content="tokenizer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '细节处见真章——LLM中的tokenizer',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">细节处见真章——LLM中的tokenizer</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-27T12:11:31.000Z" title="发表于 2024-06-27 20:11:31">2024-06-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.463Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="细节处见真章——LLM中的tokenizer"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>在大语言模型中，tokenizer（分词器）是一个非常关键的组件。它的主要功能是将输入的文本数据转换为模型能够处理的格式，通常是一个序列的token（标记）。具体来说，tokenizer将文本分割成较小的单位，通常是单词、子词或字符，这些单位称为token。</p>
+<h2 id="tokenizer的特征">tokenizer的特征</h2>
+<p>tokenizer的作用非常直观，就是将文本分割成一系列token。好的tokenizer应该具备两个特征：
+1. 高压缩率，以实现高效推理。 2.
+适当大小的词汇表，以确保每个token都被充分训练，不会出现非常低频欠训练的token。</p>
+<p>PS:
+之前可能还有一个就是要保证覆盖，即减少训练时&lt;UNK&gt;标记出现的概率。但是现在基本使用BBPE编码技术，将文本处理为字节级别的序列。任何unicode字符都由1-4个字节构成，这意味着只要LLM词表覆盖了所有unicode的字节（只有2^8=256个），理论上任何unicode字符都不会被编码成&lt;UNK&gt;了。现代的LLM基本不存在未见词（Out-of-Vocabulary,
+OOV）的问题了。</p>
+<h2 id="鱼和熊掌不可兼得">鱼和熊掌不可兼得</h2>
+<p>这两个特征看似简单，但是二者其实是矛盾的。因为高压缩率，如何提高压缩率呢？一是将高频的、长的词编入词表；二是扩大词表的大小。这样语料整体的token就会变少，一旦稀疏到一定程度，在训练数据中就有token没有出现足够多次数，导致模型对这个token欠训练。</p>
+<p>举个例子，比如“太阳能”作为一个token，比“太阳”和“能”2个token组合表示压缩率更低。然而这样“太阳能”作为一个独立的token就失去了“太阳”和“能”的加持，模型必须要从显式提到“太阳能”字眼的语料中学习它的意思，而无法根据“太阳”和“能”这两个token推断其意思。</p>
+<p>因此好的tokenizer应该在两者之间取得平衡，即保持很好的压缩率，以便在自回归token
+by
+token的框架下取得较高的推理效率，同时也要考虑预训练语料中token的分布，避免出现很稀疏、欠训练的token影响模型性能。</p>
+<h2
+id="好的tokenizer能提升上下文长度">好的tokenizer能提升上下文长度</h2>
+<p>这其实算是一个副作用。我们考虑一个极端的场景，假设一个只处理纯英语的LLM，它的词表其实支持acsii码的128个字符就可以处理所有的英文语料的训练和推理了。但带来的问题是什么？</p>
+<p>首先能想到的就是低效的推理，每个token就是一个字符，所以是一个字母一个字母出的结果。</p>
+<p>其次就是这个LLM使用时能明显感觉它的上下文比其他LLM短！因为其他LLM一个token可能就相当于4个字母了，这个LLM才1个字母。所以如果同样4K长度支持的LLM，拥有优秀tokenizer的LLM不仅具有更快的推理速度，在用户感知层面也会觉得这个LLM支持的上下文更长而且更便宜。</p>
+<p>在多语言环境里，这个问题就更加复杂。因为即使在多语言的条件下，不同语言的语料数量也是存在很大差距的，“好的tokenizer”当然会优先照顾高资源语言。虽然现在LLM的词表大小都不小，但是不同语言用户用着体验非常不同。有的语言用户可能说一句“你好”就占据大量的上下文窗口了。gpt-4o尝试解决这个问题，但似乎小小翻了个车，后面一起来讨论一下。</p>
+<h2 id="污染还是有细节">污染还是有细节？</h2>
+<p>关于gpt-4o新的<a
+target="_blank" rel="noopener" href="https://openai.com/index/hello-gpt-4o/">tokenizer</a>，openai自己是这样描述的：
+&gt; These 20 languages were chosen as representative of the new
+tokenizer's compression across different language families</p>
+<p>大概20种语言都有更好的压缩率了，多的甚至有4倍左右的token减少；中文也还行，同一句话的token减少1.4倍。这配合4o比4turbo便宜50%，可以计算相同的中文任务，4o在tokenizer增强下，实际费用为：
+<span class="math display">\[
+1 * 0.5 / 1.4 \approx 0.3571
+\]</span>
+即gpt-4o中文任务上实际成本是gpt-4turbo的35.71%，相当于打6折还要多，这可以算是相当恐怖了。</p>
+<p>但很快就有人发现词表翻车了，参见链接：<a
+target="_blank" rel="noopener" href="https://gist.github.com/ctlllll/4451e94f3b2ca415515f3ee369c8c374">github上的讨论</a>。</p>
+<p>国内有人将这个问题归结为训练tokenizer时语料没洗干净，导致中文出现了很多广告token。其实这个问题深入思考，“语料污染”这个说法对，也不对。</p>
+<p>首先说对的一方面，tokenizer完全是通过统计训练tokenizer的语料来决定哪些模式被选入词表的。如果“免费视频在线观看”这样的序列都变成token了，说明这个序列在训练tokenizer的语料里反复出现。所以说语料污染，至少在训练tokenizer的训练语料中是存在的。</p>
+<p>然后说不对的一方面。有人认为这个问题反映的是openai不重视中文，洗语料的能力倒退了。我感觉这是不靠谱的，原因有两个，一是gpt-4o在中文的榜单上表现依旧强势，个人体验4o也是又快又好。这说明训练gpt-4o本体的语料是没问题，否则很难想象在充满广告的语料里openai用什么黑科技让gpt-4o有这样好的表现。而且目前LLM预训练语料都有严格的去重清洗流程，重复度很高的广告很容易就被清洗掉了。</p>
+<p>二是混进去的奇怪token在测试时表现出明显的“欠训练”性质，比如：</p>
+<figure>
+<img src="/images/image-20240627212619381.png"
+alt="image-20240627212619381" />
+<figcaption aria-hidden="true">image-20240627212619381</figcaption>
+</figure>
+<figure>
+<img src="/images/image-20240627212657162.png"
+alt="image-20240627212657162" />
+<figcaption aria-hidden="true">image-20240627212657162</figcaption>
+</figure>
+<p>这个token似乎在实际操作中没有固定的含义，gpt-4o有时把它当作"ALLOCATE"，有时把它当作"faidh"。可以想象，如果这个token真的是在不干净的语料里大量出现，甚至还成为了token的话，那应该存在很严重的过拟合，会激发LLM说出和这个token一起出现的东西。但实际这个token更像是一个随机token，你直接和gpt-4o说这个token时它的回应更像是你随便打了个字符一样：</p>
+<figure>
+<img src="/images/image-20240627213019250.png"
+alt="image-20240627213019250" />
+<figcaption aria-hidden="true">image-20240627213019250</figcaption>
+</figure>
+<p>综合gpt-4o在中文榜单和日常使用上的表现，以及相关的噪声token表现出的明显欠训练性质，有理由相信用于训练gpt-4o的中文语料是干净的。</p>
+<p>但问题就变成了：openai在持有一份干净中文预训练语料的前提下，为什么选择使用噪声很大的语料去训练tokenizer呢？</p>
+<p>首先排除训练tokenizer时那份干净的中文预训练语料还没准备好。因为openai并不是第一次训练LLM，GPT-4的中文语料也可以拿来训练tokenizer。根据<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.10305">BaiChuan2</a>和<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2405.19327">MAP-Neo</a>的训练报告，实际tokenizer基本都来源于LLM的预训练语料，而且还是经过采样的：</p>
+<blockquote>
+<p>百川2：</p>
+<p>We use byte-pair encoding (BPE) Shibata et al. (1999) from
+SentencePiece Kudo and Richardson (2018) to tokenize the data.
+Specifically, we do not apply any normalization to the input text and we
+do not add a dummy prefix as in Baichuan 1. We split numbers into
+individual digits to better encode numeric data. To handle code data
+containing extra whitespaces, we add whitespace-only tokens to the
+tokenizer. The character coverage is set to 0.9999, with rare characters
+falling back to UTF-8 bytes. We set the maximum token length to 32 to
+account for long Chinese phrases. The training data for the Baichuan 2
+tokenizer comes from the Baichuan 2 pre-training corpus, with more
+sampled code examples and academic papers to improve coverage Taylor et
+al. (2022). Table 2 shows a detailed comparison of Baichuan 2’s
+tokenizer with others.</p>
+<p>MAP-Neo：</p>
+<p>We train our tokenizer using the byte-pair encoding (BPE) algorithm
+[88] via the implementation of SentencePiece [56]. The training data
+consists of 50B samples from the pre-training corpus, and the maximum
+length is cut to 64K. We assign higher sampling weights to code, math,
+and high-quality academic data. To balance the computational efficiency
+and model performance, we propose to set the vocabulary size to 64000
+and constrain the max sentence-piece length to 16 to improve the Chinese
+performance.</p>
+</blockquote>
+<p>MAP-Neo训练64K词表从训练数据里采样了500亿条样本。值得注意的是，这个LLM时用的开源数据训练的。因此很可能openai在GPT4时的预训练数据就超过这个量级了，训练一个200K的词表不至于会出大问题。</p>
+<p>那只有一种可能，就是openai特地在没有去重甚至没有清洗的数据上训练了分词器！这个想法看似很不着边际，但仔细想其实有一定合理性。前文提到好的tokenizer的性质之一就是高压缩率，可是这个压缩率是在哪高？实际是在用户推理场景下高，用户才能有所感知。你训练语料上压缩得再好，训练成本再低，如果用户推理时发现很耗token，出token慢，实际体验就下去了。</p>
+<p>因此，openai这次很可能没有再预训练语料上训练tokenizer，而是直接从爬虫爬下来的原始数据里训练的。我们举个简单而且极端的例子来说明一下这个事情，以及它能带来的好处。物理学人物传记其实是一个比较热门的话题，相关的语料应该也不少。物理学名人有牛顿和麦克斯韦，然而牛顿的贡献在经典力学领域，相比麦克斯韦在电磁学领域的贡献，经典力学和大部分人是更近的。因此你会看到很多人知道并且能活用牛顿的三大运动定律，而很少人知道麦克斯韦的电磁学理论。这会导致书籍里面关于牛顿的记述可能要多于麦克斯韦。如果在预训练语料中，牛顿的故事显然重复出现了太多次，我们会消除这些重复或者大同小异的牛顿传记，而麦克斯韦的传记重复率可能就比较低。这样我们得到了一个包含牛顿和麦克斯韦传记，但两者相对平衡的预训练语料，以便模型能够同时学到牛顿和麦克斯韦的相关知识。</p>
+<p>但是，如果我们从这个语料库里训练tokenizer会怎么样呢？假设“牛顿”和“麦克斯韦”有一个可以当作token加入词表，那在平衡的预训练语料中，“牛顿”和“麦克斯韦”是类似的，因为他们都是物理学家，而且出现次数差不多。因此把中文字较多的“麦克斯韦”加到词表会使得压缩率更低。但在推理时，很多人会记得牛顿，假设99个人问有关牛顿的事，1个人问有关麦克斯韦的事，“麦克斯韦”实际只在1%的情况下更高效，这时候实际形成了一个“训练高效而推理低效”的问题。</p>
+<p>如何解决这个问题呢？实际很简单，就是尊重原始分布。如果“牛顿”更多人知道，那么会有更多的传记书收录牛顿的故事，这样推理时更频繁出现的“牛顿”有更高概率进入词表。</p>
+<p>所以这次gpt-4o的词表污染事件，可能就是openai在原始中文语料分布上训练了tokenizer，以期达到“推理高效”。但他也侧面暴露了一个问题，就是尊重原始分布而不去重的前提下，如何识别这种机器生成的广告重复，而不损害广为人知的概念变成token呢？这个也许有待研究。</p>
+<p>综上所述，tokenizer是LLM中一个至关重要的组件，它负责将自然语言文本转换为模型可以理解和处理的token序列。这个组件是实现自然语言理解和生成的基础，看似不起眼，但是细节方面还是值得深究的。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/">https://lisheng2001.github.io/2024/06/27/细节处见真章——LLM中的tokenizer/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B/">大语言模型</a><a class="post-meta__tags" href="/tags/tokenizer/">tokenizer</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/07/08/%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC%E9%97%AE%E9%A2%98/" title="回溯法求解数独问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">回溯法求解数独问题</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/21/%E4%B8%80%E9%81%93%E7%89%A9%E7%90%86%E9%A2%98/" title="一道物理题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">一道物理题</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-04</div><div class="title">LLM评估</div></div></a></div><div><a href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-28</div><div class="title">从3篇论文回顾2024年基础大语言模型的进展</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#tokenizer%E7%9A%84%E7%89%B9%E5%BE%81"><span class="toc-number">1.</span> <span class="toc-text">tokenizer的特征</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%B1%BC%E5%92%8C%E7%86%8A%E6%8E%8C%E4%B8%8D%E5%8F%AF%E5%85%BC%E5%BE%97"><span class="toc-number">2.</span> <span class="toc-text">鱼和熊掌不可兼得</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A5%BD%E7%9A%84tokenizer%E8%83%BD%E6%8F%90%E5%8D%87%E4%B8%8A%E4%B8%8B%E6%96%87%E9%95%BF%E5%BA%A6"><span class="toc-number">3.</span> <span class="toc-text">好的tokenizer能提升上下文长度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B1%A1%E6%9F%93%E8%BF%98%E6%98%AF%E6%9C%89%E7%BB%86%E8%8A%82"><span class="toc-number">4.</span> <span class="toc-text">污染还是有细节？</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

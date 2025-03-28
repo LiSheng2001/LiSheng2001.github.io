@@ -1,0 +1,338 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>表达式计算专题 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="之前做了牛客的BM 49 表达式的计算之后感觉表达式计算确实很神奇。之前也有想自己实现一些查询语法的需求，但因为我没修过《编译原理》的课，于是一直被搁置着。虽然对这种复杂的查询表达式解析可能搞不太定，但是我觉得对四则运算和括号组成的这样的数学表达式应该还是要搞得定的，所以我开了这样一个专题来说明表达式计算背后的方法，也用几道题来实操一下这两个方法。 原理和方法 我们日常使用的表达式一般（夸张一点说">
+<meta property="og:type" content="article">
+<meta property="og:title" content="表达式计算专题">
+<meta property="og:url" content="https://lisheng2001.github.io/2023/09/09/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%A1%E7%AE%97%E4%B8%93%E9%A2%98/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="之前做了牛客的BM 49 表达式的计算之后感觉表达式计算确实很神奇。之前也有想自己实现一些查询语法的需求，但因为我没修过《编译原理》的课，于是一直被搁置着。虽然对这种复杂的查询表达式解析可能搞不太定，但是我觉得对四则运算和括号组成的这样的数学表达式应该还是要搞得定的，所以我开了这样一个专题来说明表达式计算背后的方法，也用几道题来实操一下这两个方法。 原理和方法 我们日常使用的表达式一般（夸张一点说">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2023-09-09T08:23:06.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.463Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="栈">
+<meta property="article:tag" content="后缀表达式">
+<meta property="article:tag" content="逆波兰表示法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2023/09/09/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%A1%E7%AE%97%E4%B8%93%E9%A2%98/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '表达式计算专题',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">表达式计算专题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-09-09T08:23:06.000Z" title="发表于 2023-09-09 16:23:06">2023-09-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.463Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="表达式计算专题"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>之前做了牛客的<a
+target="_blank" rel="noopener" href="https://www.nowcoder.com/practice/c215ba61c8b1443b996351df929dc4d4">BM
+49
+表达式的计算</a>之后感觉表达式计算确实很神奇。之前也有想自己实现一些查询语法的需求，但因为我没修过《编译原理》的课，于是一直被搁置着。虽然对这种复杂的查询表达式解析可能搞不太定，但是我觉得对四则运算和括号组成的这样的数学表达式应该还是要搞得定的，所以我开了这样一个专题来说明表达式计算背后的方法，也用几道题来实操一下这两个方法。</p>
+<h2 id="原理和方法">原理和方法</h2>
+<p>我们日常使用的表达式一般（夸张一点说，全部）是中缀表达式，这种表达式将操作数置于运算符两边，并通过括号和运算符的计算规则来表达优先级。比如"3+6*(2+5)"就是一个中缀表达式，因为(2+5)是被括号括起来的，因此要先计算括号的值，得到："3+6*7"。然后又因为乘法优先级更高，所以要先算"6*7"，得到："3+42"，最后算出结果是45。</p>
+<p>这样的中缀表达式对人来说很自然，通过括号和运算符优先级，我们可以很容易地调整表达式去进行我们想进行的计算。但对于机器来说，这样复杂的优先级规则对编写代码很不友好。还好，前人想出了一种精妙的方法将中缀表达式转换为后缀表达式，后者不需要考虑运算符和括号（准确地说是后缀表达式里没括号）的优先级了，因而对后缀表达式求值肯定是更简单的。</p>
+<p>这篇文章介绍的方法是通过调度场算法将（中缀）表达式转换为后缀表达式/逆波兰表达式后再使用逆波兰表达式的求值算法来求表达式的值。引用一下wiki上的说明简要介绍一下这两个方法吧：</p>
+<p>词条：<a
+target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-sg/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">逆波兰表示法</a></p>
+<blockquote>
+<p>逆波兰表示法（英语：Reverse Polish
+notation，缩写RPN，或逆波兰记法），是一种由波兰数学家扬·卢卡西维茨于1920年引入的数学表达式形式，在逆波兰记法中，所有操作符置于操作数的后面，因此也被称为后缀表示法、后序表示法。逆波兰记法不需要括号来标识操作符的优先级。</p>
+<p>逆波兰结构由弗里德里希·L·鲍尔和艾兹格·迪科斯彻在1960年代早期提议用于表达式求值，以利用堆栈结构减少电脑内存访问。逆波兰记法和相应的算法由澳大利亚哲学家、电脑学家查尔斯·伦纳德·汉布尔在1960年代中期扩充。</p>
+</blockquote>
+<p>词条：<a
+target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-sg/%E8%B0%83%E5%BA%A6%E5%9C%BA%E7%AE%97%E6%B3%95">调度场算法</a></p>
+<blockquote>
+<p>调度场算法（Shunting Yard
+Algorithm）是一个用于将中缀表达式转换为后缀表达式的经典算法，由艾兹格·迪杰斯特拉引入，因其操作类似于火车编组场而得名。</p>
+</blockquote>
+<p>总结一下就是调度场算法能将中缀表达式转换为不用考虑操作符优先级的后缀表达式，之后对表达式求值就比较简单了。</p>
+<h3 id="调度场算法">调度场算法</h3>
+<p>那问题的关键之一就是这个调度场算法，因为我也不知道啥叫火车编组场，所以也不太能懂这个”调度场“指的是什么。但是我们看一下伪代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">当还有记号可以读取时：</span><br><span class="line">----读取一个记号。</span><br><span class="line">----如果这个记号表示一个数字，那么将其添加到输出队列中。</span><br><span class="line">----如果这个记号表示一个函数，那么将其压入栈当中。</span><br><span class="line">----如果这个记号表示一个函数参数的分隔符（例如，一个半角逗号 , ）：</span><br><span class="line">----====从栈当中不断地弹出操作符并且放入输出队列中去，直到栈顶部的元素为一个左括号为止。如果一直没有遇到左括号，那么要么是分隔符放错了位置，要么是括号不匹配。</span><br><span class="line">----如果这个记号表示一个操作符，记做o1，那么：</span><br><span class="line">----====只要存在另一个记为o2的操作符位于栈的顶端，并且如果o1是左结合性的并且它的运算符优先级要小于或者等于o2的优先级，或者如果o1是右结合性的并且它的运算符优先级比o2的要低，那么将o2从栈的顶端弹出并且放入输出队列中（循环直至以上条件不满足为止）；</span><br><span class="line">----====然后，将o1压入栈的顶端。</span><br><span class="line">----如果这个记号是一个左括号，那么就将其压入栈当中。</span><br><span class="line">----如果这个记号是一个右括号，那么：</span><br><span class="line">----====从栈当中不断地弹出操作符并且放入输出队列中，直到栈顶部的元素为左括号为止。</span><br><span class="line">----====将左括号从栈的顶端弹出，但并不放入输出队列中去。</span><br><span class="line">----====如果此时位于栈顶端的记号表示一个函数，那么将其弹出并放入输出队列中去。</span><br><span class="line">----====如果在找到一个左括号之前栈就已经弹出了所有元素，那么就表示在表达式中存在不匹配的括号。</span><br><span class="line">当再没有记号可以读取时：</span><br><span class="line">----如果此时在栈当中还有操作符：</span><br><span class="line">----如果此时位于栈顶端的操作符是一个括号，那么就表示在表达式中存在不匹配的括号。</span><br><span class="line">----将操作符逐个弹出并放入输出队列中。</span><br><span class="line">退出算法。</span><br></pre></td></tr></table></figure>
+<p>这是一个考虑了函数符号的版本，我们先不考虑函数因此略去关于函数的部分。</p>
+<p>我们从头开始看，”读取一个记号“中的”记号“其实对应的是英文中的"token"，意思是一个能表达含义的字符块。比如”132+133“里面的token应该是["132",
+"+",
+"133"]，而不是按字符读取的，这样的预处理可以让后面的算法专注于将有优先级的中缀表达式转换为后缀表达式而不需要关心怎么样将零散的数字字符合并为一个完整的数字。在实现中，我们可以使用正则表达式来做到token的切分。</p>
+<p>之后，第二句开始提到了一个输出队列的概念，当算法退出时，这个队列依次出队就能完成中缀表达式到后缀表达式的转换。这个分支的意思是token是数字时把数字添加到队列里，这是必要的。</p>
+<p>再后面就开始判断函数是操作符了，这也是最精彩的部分之一。因为中缀表达式操作符是在操作数中间的，而后缀表达式是在操作数后面，所以转换时操作符需要想火车一样驶入支路中，先让两个操作数开过去了之后再在合适的时机开到操作数后面。这个合适的时机有两个，一个是最后面了没操作符了，所以从符号栈中弹出所有符号；另一个就是这几行伪代码分支描述的，有低优先级/同优先级的运算符要开进去了，如果这个运算符再不开到输出队列里就会改变表达式的意思。</p>
+<p>对符号栈出栈第二种情况，它是怎么判断时机合适的呢？当有一个新的运算符要进符号栈的时候，算法会检查这个运算符之前的符号是不是已经到了进去的时机了，具体来讲如果栈顶的符号优先级大于这个符号，那显然它是要先于这个符号计算的，所以现在不出栈的话后面就会在这个符号后面出栈，就违背了它在表达式中先进行计算的本意。反之，如果栈顶符号优先级小于这个符号，那么它不应该出栈，因为本来这个要入栈的符号就要先于现在栈顶的符号计算。至于同优先级的情况，则需要考虑当前的算符是左结合的还是右结合的，四则运算的算符都是左结合的，即从左到右计算；但有些算符比如幂计算是从右到左进行计算的，"2^3^2"应该表达的是<span
+class="math inline">\(2^{3^2}\)</span>，因此要先算<span
+class="math inline">\(3^2=9\)</span>之后再算<span
+class="math inline">\(2^9=512\)</span>。对于左结合的运算符，那肯定是前面的先算，所以同优先级下先进来的算符应该先出栈；反之，如果是右结合计算符，那同优先级下应该先进来的应该后出栈，也即同优先级栈顶元素就不出栈了。</p>
+<p>之后是对括号的处理，括号类似一个提高优先级的手段，如果发现了右括号，我们就会一直出符号栈直到遇到左括号。这种方法也是比较巧妙的一个点，就是利用了括号闭合的式子先算的特点，直接弹出运算符提高括号内运算的优先级。这里要注意左括号出栈的唯一机会就是被右括号抵消，因此它实际上应该是运算优先级”最低“的符号，它除非遇到左括号否则不应该在任何算符之前出栈。</p>
+<p>最后就是符号栈出栈的第一种情况了，如果所有的标记都遍历完了，那就让符号栈的算符依次出去，这样可以保证操作数在对应操作符前面。遍历完所有标记，出完符号栈的所有符号，剩下的输出队列里就是后缀表达式了。</p>
+<p>上面就是对这个调度场算法的全部解读了，引用一下wiki上的示意图来直观感受一下这个过程：</p>
+<figure>
+<img src="/images/Shunting_yard.svg" alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<h3 id="逆波兰表达式计算">逆波兰表达式计算</h3>
+<p>逆波兰表达式的计算可以根据这个表示方法的性质进行操作，因为算符在操作数后面，因此如果遇到操作数就把操作数压入一个数字栈中，遇到运算符就从数字栈中出栈对应数目的数字完成计算，并将结果压回到数字栈。重复该过程直到完成整个逆波兰表达式的遍历即可，对正确的逆波兰表达式此时数字栈只会剩下唯一的一个元素，该元素就是这个逆波兰表达式的结果。</p>
+<p>结合这两个过程，我们就可以计算中缀表达式啦！</p>
+<h3 id="双栈解法">双栈解法</h3>
+<p>能不能将调度场算法和逆波兰表达式计算融合起来，不需要转换成完整的后缀表达式就得出答案呢？答案是可以的，就是一开始就维护符号栈和数字栈两个栈。双栈解法的本质是逆波兰表达式优先计算的符号在前面，只要有符号出栈就说明这个符号需要先计算，因此可以边转化逆波兰表达式边完成逆波兰表达式的计算。这样不需要得到一个完整的逆波兰表达式，而只需要维护中间结果和还未出栈的符号，最后数字栈的唯一元素也就是表达式的解。</p>
+<p>总结来说双栈解法就是边转化逆波兰表达式边计算的变体，本质上还是调度场算法和逆波兰表达式的计算。</p>
+<h2 id="表达式计算的实操">表达式计算的实操</h2>
+<p>主要是用调度场算法+逆波兰表达式计算方法解决一下之前的提到的那几个题。</p>
+<h3 id="逆波兰表达式求值">150. 逆波兰表达式求值</h3>
+<p>url：<a
+target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-reverse-polish-notation/">150.
+逆波兰表达式求值</a></p>
+<p>考察知识点：栈</p>
+<p>就按上面说的实现一下即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">evalRPN</span>(<span class="params">self, tokens: <span class="type">List</span>[<span class="built_in">str</span>]</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        stack = []</span><br><span class="line">        <span class="keyword">for</span> token <span class="keyword">in</span> tokens:</span><br><span class="line">            <span class="keyword">if</span> token <span class="keyword">in</span> <span class="string">&quot;+-*/&quot;</span>:</span><br><span class="line">                a = stack.pop()</span><br><span class="line">                b = stack.pop()</span><br><span class="line">                <span class="keyword">if</span> token == <span class="string">&quot;+&quot;</span>:</span><br><span class="line">                    stack.append(b+a)</span><br><span class="line">                <span class="keyword">elif</span> token == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">                    stack.append(b-a)</span><br><span class="line">                <span class="keyword">elif</span> token == <span class="string">&quot;*&quot;</span>:</span><br><span class="line">                    stack.append(b*a)</span><br><span class="line">                <span class="keyword">elif</span> token == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">                    stack.append(<span class="built_in">int</span>(b / a))</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 操作数</span></span><br><span class="line">                stack.append(<span class="built_in">int</span>(token))</span><br><span class="line">        <span class="keyword">return</span> stack[-<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="基本计算器">224. 基本计算器</h3>
+<p>url：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/basic-calculator/">224.
+基本计算器</a></p>
+<p>考察知识点：中缀表达式转后缀表达式、逆波兰表达式计算</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="comment"># 处理单目的&quot;-&quot;运算符</span></span><br><span class="line">unimal_op = re.<span class="built_in">compile</span>(<span class="string">r&#x27;(?&lt;=[^\d)])-&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">op_priority</span>(<span class="params">self, c</span>):</span><br><span class="line">        <span class="keyword">if</span> c == <span class="string">&quot;*&quot;</span> <span class="keyword">or</span> c == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">2</span></span><br><span class="line">        <span class="keyword">elif</span> c == <span class="string">&quot;+&quot;</span> <span class="keyword">or</span> c == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">calculate</span>(<span class="params">self, s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        num_stack = []</span><br><span class="line">        op_stack = []</span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        s = s.replace(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">        s = unimal_op.sub(<span class="string">&quot;0-&quot;</span>, s)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(s):</span><br><span class="line">            c = s[i]</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> c == <span class="string">&quot;(&quot;</span>:</span><br><span class="line">                op_stack.append(c)</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> c <span class="keyword">in</span> <span class="string">&quot;+-*/&quot;</span>:</span><br><span class="line">                <span class="keyword">while</span> <span class="built_in">len</span>(op_stack) &gt; <span class="number">0</span> <span class="keyword">and</span> self.op_priority(op_stack[-<span class="number">1</span>]) &gt;= self.op_priority(c):</span><br><span class="line">                    op = op_stack.pop()</span><br><span class="line">                    <span class="keyword">if</span> op == <span class="string">&quot;-&quot;</span> <span class="keyword">and</span> <span class="built_in">len</span>(num_stack) == <span class="number">1</span>:</span><br><span class="line">                        num_stack.append(-<span class="number">1</span> * num_stack.pop())</span><br><span class="line">                    <span class="keyword">else</span>:  </span><br><span class="line">                        a = num_stack.pop()</span><br><span class="line">                        b = num_stack.pop()</span><br><span class="line">                        <span class="keyword">if</span> op == <span class="string">&quot;+&quot;</span>:</span><br><span class="line">                            num_stack.append(b+a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">                            num_stack.append(b-a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;*&quot;</span>:</span><br><span class="line">                            num_stack.append(b*a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">                            num_stack.append(<span class="built_in">int</span>(b/a))</span><br><span class="line">                op_stack.append(c)</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> c == <span class="string">&quot;)&quot;</span>:</span><br><span class="line">                <span class="keyword">while</span> op_stack[-<span class="number">1</span>] != <span class="string">&quot;(&quot;</span>:</span><br><span class="line">                    op = op_stack.pop()</span><br><span class="line">                    <span class="keyword">if</span> op == <span class="string">&quot;-&quot;</span> <span class="keyword">and</span> <span class="built_in">len</span>(num_stack) == <span class="number">1</span>:</span><br><span class="line">                        num_stack.append(-<span class="number">1</span> * num_stack.pop())</span><br><span class="line">                    <span class="keyword">else</span>:  </span><br><span class="line">                        a = num_stack.pop()</span><br><span class="line">                        b = num_stack.pop()</span><br><span class="line">                        <span class="keyword">if</span> op == <span class="string">&quot;+&quot;</span>:</span><br><span class="line">                            num_stack.append(b+a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">                            num_stack.append(b-a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;*&quot;</span>:</span><br><span class="line">                            num_stack.append(b*a)</span><br><span class="line">                        <span class="keyword">elif</span> op == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">                            num_stack.append(<span class="built_in">int</span>(b/a))</span><br><span class="line">                op_stack.pop()</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 操作数</span></span><br><span class="line">                num_str = <span class="string">&quot;&quot;</span></span><br><span class="line">                <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(s) <span class="keyword">and</span> s[i].isdigit():</span><br><span class="line">                    num_str += s[i]</span><br><span class="line">                    i += <span class="number">1</span></span><br><span class="line">                num_stack.append(<span class="built_in">int</span>(num_str))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 把没算完的算完</span></span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">len</span>(op_stack) &gt; <span class="number">0</span>:</span><br><span class="line">            op = op_stack.pop()</span><br><span class="line">            <span class="keyword">if</span> op == <span class="string">&quot;-&quot;</span> <span class="keyword">and</span> <span class="built_in">len</span>(num_stack) == <span class="number">1</span>:</span><br><span class="line">                num_stack.append(-<span class="number">1</span> * num_stack.pop())</span><br><span class="line">            <span class="keyword">else</span>:  </span><br><span class="line">                a = num_stack.pop()</span><br><span class="line">                b = num_stack.pop()</span><br><span class="line">                <span class="keyword">if</span> op == <span class="string">&quot;+&quot;</span>:</span><br><span class="line">                    num_stack.append(b+a)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">                    num_stack.append(b-a)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">&quot;*&quot;</span>:</span><br><span class="line">                    num_stack.append(b*a)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">                    num_stack.append(<span class="built_in">int</span>(b/a))</span><br><span class="line">        <span class="keyword">return</span> num_stack[-<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>这里用了一个变通的方式处理单目的”-“号，就是预先将单目的”-“处理为”0-“，这样单目的负号可以转化为减号，就不用单独处理了。</p>
+<h3 id="p1175-表达式的转换">P1175 表达式的转换</h3>
+<p>url：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1175">P1175
+表达式的转换</a></p>
+<p>考察知识点：中缀表达式转后缀表达式、逆波兰表达式计算</p>
+<p>这题目就考察到了右结合的"^"算符的处理，然后额外要打印每次逆波兰表达式计算的中间情况。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="comment"># 读取输入</span></span><br><span class="line">s = <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义正则表达式来匹配整数和浮点数以及运算符</span></span><br><span class="line">pattern = re.<span class="built_in">compile</span>(<span class="string">r&#x27;(\d+\.\d+|\d+|[-+*/()\^])&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析token</span></span><br><span class="line">tokens = pattern.findall(s)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 符号栈和输出队列</span></span><br><span class="line">op_stack = []</span><br><span class="line">output_queue = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 优先级字典</span></span><br><span class="line">priority = &#123;<span class="string">&quot;(&quot;</span>: <span class="number">0</span>, <span class="string">&quot;+&quot;</span>: <span class="number">1</span>, <span class="string">&quot;-&quot;</span>: <span class="number">1</span>, <span class="string">&quot;*&quot;</span>: <span class="number">2</span>, <span class="string">&quot;/&quot;</span>: <span class="number">2</span>, <span class="string">&quot;^&quot;</span>: <span class="number">3</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> tokens:</span><br><span class="line">    <span class="keyword">if</span> token <span class="keyword">in</span> <span class="string">&quot;-+*/^&quot;</span>:</span><br><span class="line">        <span class="keyword">if</span> token == <span class="string">&quot;^&quot;</span>:</span><br><span class="line">            <span class="comment"># 单独考虑右结合运算符</span></span><br><span class="line">            <span class="keyword">while</span> <span class="built_in">len</span>(op_stack) &gt; <span class="number">0</span> <span class="keyword">and</span> priority[op_stack[-<span class="number">1</span>]] &gt; priority[token]:</span><br><span class="line">                output_queue.append(op_stack.pop())</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 左结合，不低于就可以弹出</span></span><br><span class="line">            <span class="keyword">while</span> <span class="built_in">len</span>(op_stack) &gt; <span class="number">0</span> <span class="keyword">and</span> priority[op_stack[-<span class="number">1</span>]] &gt;= priority[token]:</span><br><span class="line">                output_queue.append(op_stack.pop())</span><br><span class="line">        op_stack.append(token)</span><br><span class="line">    <span class="keyword">elif</span> token == <span class="string">&quot;(&quot;</span>:</span><br><span class="line">        op_stack.append(<span class="string">&quot;(&quot;</span>)</span><br><span class="line">    <span class="keyword">elif</span> token == <span class="string">&quot;)&quot;</span>:</span><br><span class="line">        <span class="comment"># 弹出栈直到遇到&quot;(&quot;</span></span><br><span class="line">        <span class="keyword">while</span> op_stack[-<span class="number">1</span>] != <span class="string">&quot;(&quot;</span>:</span><br><span class="line">            output_queue.append(op_stack.pop())</span><br><span class="line">        <span class="comment"># 弹出右括号</span></span><br><span class="line">        op_stack.pop()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 加入操作数</span></span><br><span class="line">        output_queue.append(<span class="built_in">int</span>(token))</span><br><span class="line"><span class="comment"># 将剩余操作符送入输出队列中</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">len</span>(op_stack) &gt; <span class="number">0</span>:</span><br><span class="line">    output_queue.append(op_stack.pop())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印一下逆波兰表达式</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot; &quot;</span>.join([<span class="built_in">str</span>(token) <span class="keyword">for</span> token <span class="keyword">in</span> output_queue]))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算逆波兰表达式的值</span></span><br><span class="line">num_stack = []</span><br><span class="line"><span class="keyword">while</span> <span class="built_in">len</span>(output_queue) &gt; <span class="number">0</span>:</span><br><span class="line">    <span class="comment"># 依次出队</span></span><br><span class="line">    token = output_queue.pop(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(token, <span class="built_in">str</span>):</span><br><span class="line">        <span class="comment"># 这边是运算符，这里的运算符都是双目的因此都可以先提两个操作数</span></span><br><span class="line">        a = num_stack.pop()</span><br><span class="line">        b = num_stack.pop()</span><br><span class="line">        <span class="keyword">if</span> token == <span class="string">&quot;+&quot;</span>:</span><br><span class="line">            num_stack.append(b + a)</span><br><span class="line">        <span class="keyword">elif</span> token == <span class="string">&quot;-&quot;</span>:</span><br><span class="line">            num_stack.append(b - a)</span><br><span class="line">        <span class="keyword">elif</span> token == <span class="string">&quot;*&quot;</span>:</span><br><span class="line">            num_stack.append(b * a)</span><br><span class="line">        <span class="keyword">elif</span> token == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">            num_stack.append(<span class="built_in">int</span>(b/a))</span><br><span class="line">        <span class="keyword">elif</span> token == <span class="string">&quot;^&quot;</span>:</span><br><span class="line">            num_stack.append(b**a)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot; &quot;</span>.join([<span class="built_in">str</span>(num) <span class="keyword">for</span> num <span class="keyword">in</span> num_stack]) + <span class="string">&quot; &quot;</span> + <span class="string">&quot; &quot;</span>.join([<span class="built_in">str</span>(token) <span class="keyword">for</span> token <span class="keyword">in</span> output_queue]))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 操作数直接压栈</span></span><br><span class="line">        num_stack.append(token)</span><br></pre></td></tr></table></figure>
+<h2 id="彩蛋做一个简易计算器">彩蛋：做一个简易计算器</h2>
+<p>用括号和定义的符号优先级计算中缀表达式，对人类来说是很容易理解和掌握的，但对于计算机来说却不是。如果没有逆波兰表达式作为桥梁，随着运算符号的增多，很难想象需要多么复杂而且难以扩展的递归来实现这些行为。为了加深对这个算法的理解，我决定自己用Python做一个简易的计算器。这个简易的计算器对输入的中缀表达式转为后缀表达式，最后计算后缀表达式得出结果。</p>
+<p>项目地址：<strong><a
+target="_blank" rel="noopener" href="https://github.com/LiSheng2001/SimpleCalculator">SimpleCalculator</a></strong></p>
+<p>现在应该支持了带括号的四则运算、幂运算和取余运算。以后可能会实现更多的算子，比如单目的负号（对，现在还不支持单目负号，所以输入负数需要输入"0-{这个数的绝对值}"。这种蹩脚问题的原因是我还没想好怎么去优雅地区分单目负号和双目减号）、阶乘等。如果有时间的话，甚至可以尝试支持一下函数的运算。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2023/09/09/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%A1%E7%AE%97%E4%B8%93%E9%A2%98/">https://lisheng2001.github.io/2023/09/09/表达式计算专题/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%A0%88/">栈</a><a class="post-meta__tags" href="/tags/%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/">后缀表达式</a><a class="post-meta__tags" href="/tags/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95/">逆波兰表示法</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/10/07/%E5%88%A9%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%B0%86%E4%B8%8D%E5%90%8C%E8%AF%B4%E8%AF%9D%E4%BA%BA%E4%BB%8E%E9%9F%B3%E9%A2%91%E4%B8%AD%E5%88%86%E7%A6%BB/" title="利用深度学习将不同说话人从音频中分离"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">利用深度学习将不同说话人从音频中分离</div></div></a></div><div class="next-post pull-right"><a href="/2023/09/08/20230908%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230908刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">20230908刷题近况</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/09/08/20230908%E5%88%B7%E9%A2%98%E8%BF%91%E5%86%B5/" title="20230908刷题近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-08</div><div class="title">20230908刷题近况</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%92%8C%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">原理和方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E5%9C%BA%E7%AE%97%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">调度场算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%A1%E7%AE%97"><span class="toc-number">1.2.</span> <span class="toc-text">逆波兰表达式计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E6%A0%88%E8%A7%A3%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">双栈解法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%AE%A1%E7%AE%97%E7%9A%84%E5%AE%9E%E6%93%8D"><span class="toc-number">2.</span> <span class="toc-text">表达式计算的实操</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC"><span class="toc-number">2.1.</span> <span class="toc-text">150. 逆波兰表达式求值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%AE%A1%E7%AE%97%E5%99%A8"><span class="toc-number">2.2.</span> <span class="toc-text">224. 基本计算器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#p1175-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.3.</span> <span class="toc-text">P1175 表达式的转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%A9%E8%9B%8B%E5%81%9A%E4%B8%80%E4%B8%AA%E7%AE%80%E6%98%93%E8%AE%A1%E7%AE%97%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">彩蛋：做一个简易计算器</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

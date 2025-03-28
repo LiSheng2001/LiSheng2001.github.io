@@ -1,0 +1,1348 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>在hexo博客中插入echarts图表 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="ECharts介绍 ECharts（Enterprise Charts）是一个由百度团队开源的可视化图表库，基于 JavaScript 开发，主要用于创建交互式、响应式的可视化图表。它以强大的功能、灵活的配置以及出色的性能在数据可视化领域非常受欢迎。 它具有以下一些很好的特性：  图表类型丰富。支持折线图、柱状图、散点图、饼图、雷达图、热力图、树图、关系图等多种图表类型。甚至支持三维（3D）图表、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在hexo博客中插入echarts图表">
+<meta property="og:url" content="https://lisheng2001.github.io/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="ECharts介绍 ECharts（Enterprise Charts）是一个由百度团队开源的可视化图表库，基于 JavaScript 开发，主要用于创建交互式、响应式的可视化图表。它以强大的功能、灵活的配置以及出色的性能在数据可视化领域非常受欢迎。 它具有以下一些很好的特性：  图表类型丰富。支持折线图、柱状图、散点图、饼图、雷达图、热力图、树图、关系图等多种图表类型。甚至支持三维（3D）图表、">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2025-01-23T03:59:36.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.462Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="echarts">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '在hexo博客中插入echarts图表',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">在hexo博客中插入echarts图表</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.462Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="在hexo博客中插入echarts图表"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="echarts介绍">ECharts介绍</h2>
+<p>ECharts（<strong>Enterprise
+Charts</strong>）是一个由百度团队开源的可视化图表库，基于 JavaScript
+开发，主要用于创建交互式、响应式的可视化图表。它以强大的功能、灵活的配置以及出色的性能在数据可视化领域非常受欢迎。</p>
+<p>它具有以下一些很好的特性：</p>
+<ol type="1">
+<li>图表类型丰富。支持折线图、柱状图、散点图、饼图、雷达图、热力图、树图、关系图等多种图表类型。甚至支持三维（3D）图表、地图可视化等。</li>
+<li>强交互性。支持缩放、拖拽、动态更新、工具提示（tooltip）、联动视图等交互功能。</li>
+<li>高性能。基于 Canvas 和 WebGL
+渲染，能够高效处理大规模数据，适合展示百万级别的数据。</li>
+</ol>
+<p>更多的信息可以参见官网：<a
+target="_blank" rel="noopener" href="https://echarts.apache.org/">ECharts官网</a></p>
+<h2 id="在hexo博客中插入echarts图表">在Hexo博客中插入ECharts图表</h2>
+<p>ECharts基于JavaScript开发，理论上是可以无缝嵌入到html页面的。而Markdown是一种轻量级的标记语言，虽然支持一些html标签用来排版，但对于加入ECharts这样使用JavaScript的用例是无能为力的。</p>
+<p>但Hexo是将Markdown转换为静态的html页面再进行展示的，如果进行适当的后处理，Hexo的博客页面中可以插入ECharts图表。</p>
+<p>在本页面中，借助<a
+target="_blank" rel="noopener" href="https://github.com/D-Sketon/hexo-tag-echarts-new">hexo-tag-echarts-new</a>这个hexo插件来实现在hexo博客中插入图表。</p>
+<p>首先使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-tag-echarts-new</span><br></pre></td></tr></table></figure>
+<p>进行安装。</p>
+<p>之后，按照文档提示，通过以下格式来插入ECHarts图表：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% echarts <span class="number">100</span>% <span class="number">400</span> <span class="number">5.6</span><span class="number">.0</span> %&#125;</span><br><span class="line">\\<span class="variable constant_">TODO</span> echarts option goes here</span><br><span class="line">&#123;% endecharts %&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>echarts</code> 是标签名，不需要更改，<code>400</code>
+是图表容器的高度，<code>100%</code> 是图表容器的相对宽度。而在
+<code>tag</code>
+之间的部分，则是需要自己填充的图表数据了。注意<code>5.6.0</code>是echarts的库版本，如果库版本太久远有可能cdn那就没备份了，注意使用较新一些的库版本。</p>
+<p>感觉还是相当的符合直觉，安装完后可以测试以下是否可行。</p>
+<h2 id="测试用例">测试用例</h2>
+<h3 id="动态排序折线图">动态排序折线图</h3>
+<h4 id="实现">实现</h4>
+<p>使用了ECharts中比较炫酷的<a
+target="_blank" rel="noopener" href="https://echarts.apache.org/examples/zh/editor.html?c=line-race">动态排序折线图</a>来测试是否可用。在ECharts官网上截图效果如下：</p>
+<figure>
+<img src="/images/image-20250123120600935.png"
+alt="Income of Germany and France since 1950 png" />
+<figcaption aria-hidden="true">Income of Germany and France since 1950
+png</figcaption>
+</figure>
+<p>官网上这个示例是动态的，展示了ECharts图表强大的展示能力和交互性。通过hexo-tag-echarts-new的展示效果如下：</p>
+<!-- #region -->
+
+<div id="echarts9828" style="width: 100%;height:400px;margin: 0 auto"></div>
+<script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js" ></script>
+<script >
+  var eChartecharts9828 = echarts.init(document.getElementById('echarts9828'));
+  var optionecharts9828 = {
+  "animation": true,
+  "animationDuration": 10000,
+  "title": {
+    "text": "Income of Germany and France since 1950"
+  },
+  "tooltip": {
+    "trigger": "axis",
+    "order": "valueDesc"
+  },
+  "xAxis": {
+    "type": "category",
+    "data": [
+      1950,
+      1951,
+      1952,
+      1953,
+      1954,
+      1955,
+      1956,
+      1957,
+      1958,
+      1959,
+      1960,
+      1961,
+      1962,
+      1963,
+      1964,
+      1965,
+      1966,
+      1967,
+      1968,
+      1969,
+      1970,
+      1971,
+      1972,
+      1973,
+      1974,
+      1975,
+      1976,
+      1977,
+      1978,
+      1979,
+      1980,
+      1981,
+      1982,
+      1983,
+      1984,
+      1985,
+      1986,
+      1987,
+      1988,
+      1989,
+      1990,
+      1991,
+      1992,
+      1993,
+      1994,
+      1995,
+      1996,
+      1997,
+      1998,
+      1999,
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014
+    ]
+  },
+  "yAxis": {
+    "type": "value",
+    "name": "Income"
+  },
+  "series": [
+    {
+      "name": "Finland",
+      "type": "line",
+      "data": [
+        7198,
+        7738,
+        7914,
+        7877,
+        8470,
+        8802,
+        8971,
+        9302,
+        9276,
+        9751,
+        10560,
+        11286,
+        11560,
+        11858,
+        12389,
+        13006,
+        13269,
+        13477,
+        13726,
+        15058,
+        16245,
+        16564,
+        17722,
+        18804,
+        19273,
+        19409,
+        19268,
+        19261,
+        19608,
+        20918,
+        21965,
+        22279,
+        22873,
+        23351,
+        23926,
+        24630,
+        25133,
+        26086,
+        27282,
+        28735,
+        28599,
+        26761,
+        25726,
+        25414,
+        26301,
+        27303,
+        28210,
+        29884,
+        31423,
+        32743,
+        34517,
+        35327,
+        35834,
+        36461,
+        37783,
+        38700,
+        40115,
+        42016,
+        42122,
+        38455,
+        39425,
+        40251,
+        39489,
+        38788,
+        38569
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "France",
+      "type": "line",
+      "data": [
+        7914,
+        8301,
+        8446,
+        8622,
+        9006,
+        9453,
+        9907,
+        10442,
+        10681,
+        10911,
+        11642,
+        12168,
+        12767,
+        13235,
+        13969,
+        14514,
+        15158,
+        15759,
+        16321,
+        17339,
+        18185,
+        18891,
+        19570,
+        20486,
+        20997,
+        20851,
+        21661,
+        22270,
+        22928,
+        23647,
+        23962,
+        24186,
+        24753,
+        25188,
+        25497,
+        25917,
+        26453,
+        26963,
+        28101,
+        28942,
+        29476,
+        29707,
+        30033,
+        29719,
+        30303,
+        30823,
+        31141,
+        31756,
+        32764,
+        33707,
+        34774,
+        35197,
+        35333,
+        35371,
+        36090,
+        36395,
+        37001,
+        37641,
+        37505,
+        36215,
+        36745,
+        37328,
+        37227,
+        37309,
+        37218
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Germany",
+      "type": "line",
+      "data": [
+        7251,
+        7884,
+        8561,
+        9252,
+        9926,
+        10998,
+        11751,
+        12385,
+        12884,
+        13759,
+        14808,
+        15317,
+        15872,
+        16221,
+        17100,
+        17838,
+        18262,
+        18311,
+        19254,
+        20409,
+        21218,
+        21695,
+        22497,
+        23461,
+        23662,
+        23630,
+        24904,
+        25678,
+        26444,
+        27515,
+        27765,
+        27846,
+        27645,
+        28227,
+        29135,
+        29851,
+        30514,
+        30986,
+        31906,
+        32706,
+        31476,
+        32844,
+        33221,
+        32689,
+        33375,
+        33843,
+        34008,
+        34578,
+        35254,
+        35931,
+        36953,
+        37517,
+        37458,
+        37167,
+        37614,
+        37901,
+        39352,
+        40693,
+        41199,
+        38975,
+        40632,
+        42080,
+        42959,
+        42887,
+        43444
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Iceland",
+      "type": "line",
+      "data": [
+        8670,
+        8350,
+        8120,
+        9169,
+        9821,
+        10548,
+        10575,
+        10295,
+        10896,
+        10865,
+        10993,
+        10801,
+        11489,
+        12447,
+        13450,
+        14173,
+        15166,
+        14734,
+        13752,
+        13983,
+        14937,
+        16687,
+        17413,
+        18360,
+        19123,
+        19023,
+        19978,
+        21583,
+        22659,
+        23523,
+        24580,
+        25312,
+        25455,
+        24594,
+        25356,
+        25997,
+        27379,
+        29335,
+        28780,
+        28629,
+        28666,
+        28272,
+        26977,
+        27055,
+        27789,
+        27671,
+        28839,
+        30009,
+        31601,
+        32521,
+        33599,
+        34403,
+        34252,
+        34938,
+        37482,
+        39108,
+        39818,
+        42598,
+        42294,
+        39979,
+        38809,
+        39619,
+        39925,
+        40958,
+        41237
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Norway",
+      "type": "line",
+      "data": [
+        11452,
+        11986,
+        12316,
+        12707,
+        13247,
+        13438,
+        14054,
+        14379,
+        14285,
+        14797,
+        15542,
+        16425,
+        16793,
+        17347,
+        18118,
+        18980,
+        19588,
+        20686,
+        21022,
+        21845,
+        22186,
+        23239,
+        24308,
+        25278,
+        26252,
+        27553,
+        29117,
+        30319,
+        31348,
+        32737,
+        34346,
+        34659,
+        34704,
+        35932,
+        38057,
+        40031,
+        41450,
+        42225,
+        42101,
+        42449,
+        43296,
+        44419,
+        45742,
+        46765,
+        48850,
+        50616,
+        52892,
+        55386,
+        56502,
+        57246,
+        58699,
+        59620,
+        60152,
+        60351,
+        62370,
+        63573,
+        64573,
+        65781,
+        65216,
+        63354,
+        62946,
+        62737,
+        63620,
+        63322,
+        64020
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Poland",
+      "type": "line",
+      "data": [
+        4670,
+        4801,
+        4832,
+        5027,
+        5224,
+        5386,
+        5530,
+        5730,
+        5923,
+        6009,
+        6248,
+        6669,
+        6511,
+        6836,
+        7078,
+        7409,
+        7818,
+        8044,
+        8473,
+        8331,
+        8705,
+        9256,
+        9854,
+        10504,
+        11020,
+        11430,
+        11605,
+        11713,
+        12033,
+        11703,
+        11307,
+        10610,
+        10420,
+        10835,
+        11138,
+        11159,
+        11429,
+        11207,
+        11418,
+        11212,
+        10088,
+        9347,
+        9553,
+        9884,
+        10386,
+        11093,
+        11776,
+        12602,
+        13225,
+        13824,
+        14565,
+        14744,
+        14964,
+        15508,
+        16314,
+        16900,
+        17959,
+        19254,
+        19996,
+        20507,
+        21328,
+        22333,
+        22740,
+        23144,
+        23952
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "Russia",
+      "type": "line",
+      "data": [
+        7514,
+        7424,
+        7775,
+        7981,
+        8234,
+        8787,
+        9465,
+        9496,
+        10037,
+        9755,
+        10496,
+        10908,
+        11027,
+        10620,
+        11836,
+        12363,
+        12823,
+        13256,
+        13902,
+        13972,
+        14915,
+        15170,
+        15113,
+        16236,
+        16594,
+        16530,
+        17192,
+        17487,
+        17818,
+        17632,
+        17557,
+        17619,
+        17951,
+        18417,
+        18527,
+        18576,
+        19221,
+        19355,
+        19660,
+        19906,
+        19349,
+        18332,
+        15661,
+        14320,
+        12535,
+        12013,
+        11597,
+        11779,
+        11173,
+        11925,
+        13173,
+        13902,
+        14629,
+        15768,
+        16967,
+        18118,
+        19660,
+        21374,
+        22506,
+        20739,
+        21664,
+        22570,
+        23299,
+        23561,
+        23293
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+    {
+      "name": "United Kingdom",
+      "type": "line",
+      "data": [
+        11135,
+        11416,
+        11367,
+        11751,
+        12173,
+        12531,
+        12572,
+        12702,
+        12672,
+        13122,
+        13697,
+        13887,
+        13897,
+        14393,
+        15067,
+        15292,
+        15494,
+        15777,
+        16357,
+        16616,
+        16933,
+        17207,
+        17793,
+        19043,
+        18801,
+        18699,
+        19207,
+        19684,
+        20337,
+        20871,
+        20417,
+        20149,
+        20607,
+        21357,
+        21904,
+        22648,
+        23516,
+        24551,
+        25750,
+        26279,
+        26424,
+        26017,
+        26062,
+        26688,
+        27691,
+        28317,
+        28998,
+        29662,
+        30614,
+        31474,
+        32543,
+        33282,
+        33954,
+        35250,
+        35910,
+        36665,
+        37504,
+        38164,
+        37739,
+        35840,
+        36240,
+        36549,
+        36535,
+        36908,
+        37614
+      ],
+      "showSymbol": false,
+      "endLabel": {
+        "show": true,
+        "formatter": "{a}: {c}"
+      },
+      "labelLayout": {
+        "moveOverlap": "shiftY"
+      },
+      "emphasis": {
+        "focus": "series"
+      }
+    },
+  ],
+  "grid": {
+    "right": 140
+  },
+};
+  eChartecharts9828.setOption(optionecharts9828);
+  if (window.eChartecharts9828ResizeHandler) {
+    window.removeEventListener("resize", eChartecharts9828ResizeHandler);
+  }
+  var eChartecharts9828ResizeHandler = function() {
+    eChartecharts9828.resize();
+  };
+  window.addEventListener("resize", eChartecharts9828ResizeHandler);
+</script>
+<!-- #endregion -->
+<h4 id="小结">小结</h4>
+<p>通过询问ChatGPT费了一番功夫才弄好，主要原因在于这个图表加载了外部数据源，并且用JavaScript代码生成了各个国家的配置。而hexo-tag-echarts-new中仅支持配置静态的options，因此需要额外在JS中解包这个options并格式化。</p>
+<p>虽然过程有些坎坷，但是最后还是能展现出来的。从这个示例可以看出来hexo-tag-echarts-new这个库的优点和缺点。优点当然是直观，然后对于基础用例来说足够简单，用户不必理会JS的细节。缺点就是灵活性较差，对于展示大批量的数据可能会费劲。毕竟不能使用JS写代码，那各种循环语句都得亲力亲为地写。总结来说就是基础用例是能用而且好用的，配合vscode中<code>&lt;!-- #region --&gt;</code>和<code>&lt;!-- #endregion --&gt;</code>能很好地折叠绘图区，从而专心编辑需要的区域。</p>
+<h4 id="用到的代码">用到的代码</h4>
+<p>记录一下用JS格式化options的代码，大部分由ChatGPT编写，我参考它写的进行了一些修改。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 配置参数</span></span><br><span class="line"><span class="keyword">const</span> countriesToExtract = [<span class="string">&quot;France&quot;</span>, <span class="string">&quot;Germany&quot;</span>, ...]; <span class="comment">// 要提取的国家</span></span><br><span class="line"><span class="keyword">const</span> yearRange = [<span class="number">1950</span>, <span class="number">2014</span>]; <span class="comment">// 提取的年份范围</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 提取数据</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">extractData</span>(<span class="params">rawData, countries, yearRange</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> headers = rawData[<span class="number">0</span>]; <span class="comment">// 获取表头</span></span><br><span class="line">  <span class="keyword">const</span> countryIndex = headers.<span class="title function_">indexOf</span>(<span class="string">&quot;Country&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> yearIndex = headers.<span class="title function_">indexOf</span>(<span class="string">&quot;Year&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> incomeIndex = headers.<span class="title function_">indexOf</span>(<span class="string">&quot;Income&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 过滤数据</span></span><br><span class="line">  <span class="keyword">const</span> filteredData = rawData</span><br><span class="line">    .<span class="title function_">slice</span>(<span class="number">1</span>) <span class="comment">// 去掉表头</span></span><br><span class="line">    .<span class="title function_">filter</span>(</span><br><span class="line">      <span class="function">(<span class="params">row</span>) =&gt;</span></span><br><span class="line">        countries.<span class="title function_">includes</span>(row[countryIndex]) &amp;&amp;</span><br><span class="line">        row[yearIndex] &gt;= yearRange[<span class="number">0</span>] &amp;&amp;</span><br><span class="line">        row[yearIndex] &lt;= yearRange[<span class="number">1</span>]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 按国家分类数据</span></span><br><span class="line">  <span class="keyword">const</span> result = &#123;&#125;;</span><br><span class="line">  countries.<span class="title function_">forEach</span>(<span class="function">(<span class="params">country</span>) =&gt;</span> &#123;</span><br><span class="line">    result[country] = filteredData</span><br><span class="line">      .<span class="title function_">filter</span>(<span class="function">(<span class="params">row</span>) =&gt;</span> row[countryIndex] === country)</span><br><span class="line">      .<span class="title function_">map</span>(<span class="function">(<span class="params">row</span>) =&gt;</span> (&#123;</span><br><span class="line">        <span class="attr">year</span>: row[yearIndex],</span><br><span class="line">        <span class="attr">income</span>: row[incomeIndex],</span><br><span class="line">      &#125;));</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行提取</span></span><br><span class="line"><span class="keyword">const</span> extractedData = <span class="title function_">extractData</span>(rawData, countriesToExtract, yearRange);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 格式化为 ECharts 格式</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">formatForECharts</span>(<span class="params">extractedData</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> years = <span class="title class_">Array</span>.<span class="title function_">from</span>(</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Set</span>(</span><br><span class="line">      <span class="title class_">Object</span>.<span class="title function_">values</span>(extractedData)</span><br><span class="line">        .<span class="title function_">flat</span>()</span><br><span class="line">        .<span class="title function_">map</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> item.<span class="property">year</span>)</span><br><span class="line">    )</span><br><span class="line">  ).<span class="title function_">sort</span>(<span class="function">(<span class="params">a, b</span>) =&gt;</span> a - b);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> series = <span class="title class_">Object</span>.<span class="title function_">keys</span>(extractedData).<span class="title function_">map</span>(<span class="function">(<span class="params">country</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> countryData = extractedData[country];</span><br><span class="line">    <span class="keyword">const</span> data = years.<span class="title function_">map</span>(<span class="function">(<span class="params">year</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> entry = countryData.<span class="title function_">find</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> item.<span class="property">year</span> === year);</span><br><span class="line">      <span class="keyword">return</span> entry ? entry.<span class="property">income</span> : <span class="literal">null</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">name</span>: country,</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;line&quot;</span>,</span><br><span class="line">      <span class="attr">data</span>: data,</span><br><span class="line">      <span class="attr">showSymbol</span>: <span class="literal">false</span>,</span><br><span class="line">      <span class="attr">endLabel</span>: &#123;</span><br><span class="line">        <span class="attr">show</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">formatter</span>: <span class="string">&quot;&#123;a&#125;: &#123;c&#125;&quot;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">labelLayout</span>: &#123;</span><br><span class="line">        <span class="attr">moveOverlap</span>: <span class="string">&quot;shiftY&quot;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">emphasis</span>: &#123;</span><br><span class="line">        <span class="attr">focus</span>: <span class="string">&quot;series&quot;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="attr">xAxis</span>: &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;category&quot;</span>,</span><br><span class="line">      <span class="attr">data</span>: years,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">yAxis</span>: &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;value&quot;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;Income&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">series</span>: series,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转换为 ECharts 格式</span></span><br><span class="line"><span class="keyword">const</span> chartData = <span class="title function_">formatForECharts</span>(extractedData);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出 JSON 格式</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(chartData, <span class="literal">null</span>, <span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+<h3 id="渐变堆叠面积图">渐变堆叠面积图</h3>
+<p>上面的示例可以看出来hexo-tag-echarts-new直观的地方和一些缺点。<a
+target="_blank" rel="noopener" href="https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient">渐变堆叠面积图</a>是hexo-tag-echarts-new这样的静态options没办法做到的，主要是因为渐变效果必须通过JS代码实现：
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">..., </span><br><span class="line"><span class="attr">series</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;Line 1&#x27;</span>,</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;line&#x27;</span>,</span><br><span class="line">      <span class="attr">stack</span>: <span class="string">&#x27;Total&#x27;</span>,</span><br><span class="line">      <span class="attr">smooth</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">lineStyle</span>: &#123;</span><br><span class="line">        <span class="attr">width</span>: <span class="number">0</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">showSymbol</span>: <span class="literal">false</span>,</span><br><span class="line">      <span class="attr">areaStyle</span>: &#123;</span><br><span class="line">        <span class="attr">opacity</span>: <span class="number">0.8</span>,</span><br><span class="line">        <span class="attr">color</span>: <span class="keyword">new</span> echarts.<span class="property">graphic</span>.<span class="title class_">LinearGradient</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, [</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="attr">offset</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">color</span>: <span class="string">&#x27;rgb(128, 255, 165)&#x27;</span></span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="attr">offset</span>: <span class="number">1</span>,</span><br><span class="line">            <span class="attr">color</span>: <span class="string">&#x27;rgb(1, 191, 236)&#x27;</span></span><br><span class="line">          &#125;</span><br><span class="line">        ])</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">emphasis</span>: &#123;</span><br><span class="line">        <span class="attr">focus</span>: <span class="string">&#x27;series&#x27;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">data</span>: [<span class="number">140</span>, <span class="number">232</span>, <span class="number">101</span>, <span class="number">264</span>, <span class="number">90</span>, <span class="number">340</span>, <span class="number">250</span>]</span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
+<p>为了在这种情况下也能正常显示echarts图表，查阅了hexo的文档，发现<code>raw</code>语法非常适合。被<code>raw</code>语法包裹的html代码hexo不会解释为Markdown处理，而是直接当作原始html处理的。那直接使用原始的echarts代码即可。但好像高度不太对，通过设置父元素的样式可以让高度恢复正常。</p>
+<p><strong>20250207更新</strong>：塞一大堆HTML代码进去让Typora编辑器几乎废了，一个更好地办法是引入可以折叠的HTML块，以便在编辑和浏览时不要显示它们。因此，参考<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/USTHzhanglu/p/16073072.html">这篇博客</a>我决定使用HTML的折叠语句来支持对原生ECharts图表代码的折叠，以同时满足渲染显示和图表编辑两方面的需求。注意，因为这是HTML和Markdown混排，因此在HTML代码内部尽量不要出现连续换行符，以免干扰解析造成格式错误。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">details</span> <span class="attr">open</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">summary</span>&gt;</span>展开查看图表<span class="tag">&lt;/<span class="name">summary</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pre</span> <span class="attr">style</span>=<span class="string">&quot;background-color: #fff; color: #000; white-space: normal;&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;height: 60vh; margin: 0; padding: 0;&quot;</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- ECharts图表代码 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">pre</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">details</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这样设置后，需要JS介入的复杂图表也能有办法展示了：</p>
+
+<details open>
+  <summary>展开查看图表</summary>
+  <pre style="background-color: #fff; color: #000; white-space: normal;">
+<div style="height: 60vh; margin: 0; padding: 0;">
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient
+-->
+  <div id="container" style="height: 100%; width: 100%; "></div>
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/echarts.min.js"></script>
+  <!-- Uncomment this line if you want to dataTool extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/extension/dataTool.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use gl extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-gl/2/files/dist/echarts-gl.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-stat extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-stat/latest/files/dist/ecStat.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-graph-modularity extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-graph-modularity/2/files/dist/echarts-graph-modularity.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use map
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/4.9.0/files/map/js/world.js"></script>
+  -->
+  <!-- Uncomment these two lines if you want to use bmap extension
+  <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=YOUR_API_KEY"></script>
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/extension/bmap.min.js"></script>
+  -->
+  <script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, "light", {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    var option;
+    option = {
+      color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
+      title: {
+        text: 'Gradient Stacked Area Chart'
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        }
+      },
+      legend: {
+        data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {}
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: [
+        {
+          name: 'Line 1',
+          type: 'line',
+          stack: 'Total',
+          smooth: true,
+          lineStyle: {
+            width: 0
+          },
+          showSymbol: false,
+          areaStyle: {
+            opacity: 0.8,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(128, 255, 165)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(1, 191, 236)'
+              }
+            ])
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [140, 232, 101, 264, 90, 340, 250]
+        },
+        {
+          name: 'Line 2',
+          type: 'line',
+          stack: 'Total',
+          smooth: true,
+          lineStyle: {
+            width: 0
+          },
+          showSymbol: false,
+          areaStyle: {
+            opacity: 0.8,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(0, 221, 255)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(77, 119, 255)'
+              }
+            ])
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [120, 282, 111, 234, 220, 340, 310]
+        },
+        {
+          name: 'Line 3',
+          type: 'line',
+          stack: 'Total',
+          smooth: true,
+          lineStyle: {
+            width: 0
+          },
+          showSymbol: false,
+          areaStyle: {
+            opacity: 0.8,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(55, 162, 255)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(116, 21, 219)'
+              }
+            ])
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [320, 132, 201, 334, 190, 130, 220]
+        },
+        {
+          name: 'Line 4',
+          type: 'line',
+          stack: 'Total',
+          smooth: true,
+          lineStyle: {
+            width: 0
+          },
+          showSymbol: false,
+          areaStyle: {
+            opacity: 0.8,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(255, 0, 135)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(135, 0, 157)'
+              }
+            ])
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [220, 402, 231, 134, 190, 230, 120]
+        },
+        {
+          name: 'Line 5',
+          type: 'line',
+          stack: 'Total',
+          smooth: true,
+          lineStyle: {
+            width: 0
+          },
+          showSymbol: false,
+          label: {
+            show: true,
+            position: 'top'
+          },
+          areaStyle: {
+            opacity: 0.8,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(255, 191, 0)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(224, 62, 76)'
+              }
+            ])
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [220, 302, 181, 234, 210, 290, 150]
+        }
+      ]
+    };
+        if (option && typeof option === 'object') {
+          myChart.setOption(option);
+        }
+        window.addEventListener('resize', myChart.resize);
+        myChart.resize();
+  </script>
+</div>
+</pre>
+</details>
+
+<h2 id="总结">总结</h2>
+<p>简单地总结一下，hexo-tag-echarts-new插件对在hexo内插入echarts图表很友好，对于简单的图表配置好echarts的options就可以进行绘制。</p>
+<p>对于很复杂需要JS介入的echarts图表，可以使用<code>raw</code>语法来进行HTML和JS的原生实现。</p>
+<p><strong>20250207更新</strong>：<code>hexo-tag-echarts-new</code>插件会在原来的Markdown文档中插入大量代码，而且在Typora中没办法折叠。为了同时支持带ECharts图表博客的浏览和流畅编辑，之后的ECharts图表都将采用原生HTML代码+折叠块代码的形式实现。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/">https://lisheng2001.github.io/2025/01/23/在hexo博客中插入echarts图表/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/hexo/">hexo</a><a class="post-meta__tags" href="/tags/echarts/">echarts</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">评估LLM之在24年的管理类联考逻辑选择题评估</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">huggingface中Datasets模块的笔记</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#echarts%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">ECharts介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8"><span class="toc-number">2.</span> <span class="toc-text">在Hexo博客中插入ECharts图表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B"><span class="toc-number">3.</span> <span class="toc-text">测试用例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E6%8E%92%E5%BA%8F%E6%8A%98%E7%BA%BF%E5%9B%BE"><span class="toc-number">3.1.</span> <span class="toc-text">动态排序折线图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.1.</span> <span class="toc-text">实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">3.1.2.</span> <span class="toc-text">小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E5%88%B0%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="toc-number">3.1.3.</span> <span class="toc-text">用到的代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%90%E5%8F%98%E5%A0%86%E5%8F%A0%E9%9D%A2%E7%A7%AF%E5%9B%BE"><span class="toc-number">3.2.</span> <span class="toc-text">渐变堆叠面积图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

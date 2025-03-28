@@ -1,0 +1,394 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>回溯法求解数独问题 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="引言 起因是在leetcode上看到了这题：36. 有效的数独，这题其实是判断数独的初始盘面是不是有效的，即初始数字是否满足行、列和小方块里都不重复的条件。可以通过一次遍历解决。 123456789101112131415161718192021222324252627282930313233class Solution:    def isValidSudoku(self, board: Lis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="回溯法求解数独问题">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/07/08/%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="引言 起因是在leetcode上看到了这题：36. 有效的数独，这题其实是判断数独的初始盘面是不是有效的，即初始数字是否满足行、列和小方块里都不重复的条件。可以通过一次遍历解决。 123456789101112131415161718192021222324252627282930313233class Solution:    def isValidSudoku(self, board: Lis">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-07-08T04:36:27.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.462Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="回溯法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/07/08/%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC%E9%97%AE%E9%A2%98/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '回溯法求解数独问题',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">回溯法求解数独问题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-07-08T04:36:27.000Z" title="发表于 2024-07-08 12:36:27">2024-07-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.462Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="回溯法求解数独问题"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="引言">引言</h2>
+<p>起因是在leetcode上看到了这题：<a
+target="_blank" rel="noopener" href="https://leetcode.cn/problems/valid-sudoku/description">36.
+有效的数独</a>，这题其实是判断数独的初始盘面是不是有效的，即初始数字是否满足行、列和小方块里都不重复的条件。可以通过一次遍历解决。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">isValidSudoku</span>(<span class="params">self, board: <span class="type">List</span>[<span class="type">List</span>[<span class="built_in">str</span>]]</span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">        <span class="comment"># 一次遍历</span></span><br><span class="line">        n = <span class="built_in">len</span>(board)</span><br><span class="line">        row_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">        col_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">        square_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">                num = board[i][j]</span><br><span class="line">                <span class="keyword">if</span> num == <span class="string">&quot;.&quot;</span>:</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="comment"># 先行后列再方框</span></span><br><span class="line">                <span class="keyword">if</span> num <span class="keyword">in</span> row_counter_list[i]:</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    row_counter_list[i].add(num)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> num <span class="keyword">in</span> col_counter_list[j]:</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    col_counter_list[j].add(num)</span><br><span class="line">                </span><br><span class="line">                row_index = i // <span class="number">3</span></span><br><span class="line">                col_index = j // <span class="number">3</span></span><br><span class="line">                square_index = row_index * <span class="number">3</span> + col_index</span><br><span class="line">                <span class="keyword">if</span> num <span class="keyword">in</span> square_counter_list[square_index]:</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    square_counter_list[square_index].add(num)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p>因为数独的元素天生是数字，所以这里的counter实际上可以用数组表示。但为了方便使用<code>in</code>的语法，这里直接申请了集合，占用空间会大一些。</p>
+<p>一开始看这道题的时候把我吓了一下，因为是做“有效的数独”，还以为要判断这个数独可不可解，解唯一不唯一才能判断“有效性”。看题面后发现是看初始条件有效就行了。那也引发一个问题，如果真的要解数独，或者要判断这个数独题目可不可解有办法做吗？</p>
+<h2 id="回溯法及框架">回溯法及框架</h2>
+<p>学过的算法加解题的技巧就下面几种： 1. 分治法（Divide-and-conquer
+method, DC） 2. 二分查找（Binary seach） 3. 双指针（Double point） 4.
+滑动窗口（Sliding Window） 5. 贪心法（Greedy algorithm） 6.
+动态规划（Dynamic promgraming, DP） 7. 回溯法（Backtracking）</p>
+<p>因为不是查找问题，所以2，3，4可能都用不了。贪心法和动态规划一般用于求解最优化的问题，这里似乎也不太好用。分治法因为数独行、列和小方框之间都有联系，似乎不太好分治。因此选择回溯法去做，通过深度优先搜索和回溯来查找数独题面的可行解。</p>
+<p>引用一下wiki上的解释：</p>
+<blockquote>
+<p><strong>回溯法（英语：backtracking）</strong>是暴力搜索法中的一种。</p>
+<p>对于某些计算问题而言，回溯法是一种可以找出所有（或一部分）解的一般性算法，尤其适用于约束满足问题（在解决约束满足问题时，我们逐步构造更多的候选解，并且在确定某一部分候选解不可能补全成正确解之后放弃继续搜索这个部分候选解本身及其可以拓展出的子候选解，转而测试其他的部分候选解）。</p>
+<p>在经典的教科书中，八皇后问题展示了回溯法的用例。（八皇后问题是在标准国际象棋棋盘中寻找八个皇后的所有分布，使得没有一个皇后能攻击到另外一个。）</p>
+<p>回溯法采用试错的思想，它尝试分步的去解决一个问题。在分步解决问题的过程中，当它通过尝试发现，现有的分步答案不能得到有效的正确的解答的时候，它将取消上一步甚至是上几步的计算，再通过其它的可能的分步解答再次尝试寻找问题的答案。回溯法通常用最简单的递归方法来实现，在反复重复上述的步骤后可能出现两种情况：
+- 找到一个可能存在的正确的答案 -
+在尝试了所有可能的分步方法后宣告该问题没有答案</p>
+<p>在最坏的情况下，回溯法会导致一次复杂度为指数时间的计算。</p>
+</blockquote>
+<p>上算法课的时候老师总结了一个好用的回溯法思考框架：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">The following is the algorithm framework and should not be modified.</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">v</span>):</span><br><span class="line">    advance(v)</span><br><span class="line">    <span class="keyword">if</span> isLeaf(v):</span><br><span class="line">        remark(v)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        e = nextAdj(v, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">while</span> e <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> exceedBound(v + [e]):</span><br><span class="line">                v.append(e)</span><br><span class="line">                dfs(v)</span><br><span class="line">            e = nextAdj(v, e)</span><br><span class="line">    backtrack(v)</span><br><span class="line"></span><br><span class="line">dfs([])</span><br></pre></td></tr></table></figure>
+<p>其辅助函数的实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">nextAdj</span>(<span class="params">v, e</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    The following 2 lines should not be modified.</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">if</span> e <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        e = <span class="number">0</span>  <span class="comment"># Permutation Problem start by 1, while Subset Problem start by 0, e is its leader</span></span><br><span class="line">    <span class="comment"># Add the rest of the implementation for nextAdj if needed</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">v</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(v) == <span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;the end...&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># print(&#x27;backtracking from &#x27; + str(v))</span></span><br><span class="line">        <span class="keyword">del</span> v[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">isLeaf</span>(<span class="params">v</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(v) == n:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+<p>简单解释一下各个部分的含义：</p>
+<ol type="1">
+<li><strong>函数 <code>dfs(v)</code></strong>：
+<ul>
+<li><code>dfs</code> 是深度优先搜索（Depth First
+Search）的缩写。<code>v</code>
+是当前的部分解，即一个从起始状态到当前状态的路径或部分解集。</li>
+</ul></li>
+<li><strong>函数调用 <code>advance(v)</code></strong>：
+<ul>
+<li>这是一个占位符函数，通常用于在进入下一个递归调用前做一些初始化或准备工作。在具体实现中，可能包括更新状态、打印调试信息等。</li>
+</ul></li>
+<li><strong>条件检查 <code>isLeaf(v)</code></strong>：
+<ul>
+<li>检查当前部分解 <code>v</code>
+是否已经达到叶子节点。叶子节点通常表示一种完全解或一种可接受的终止状态。</li>
+<li><code>isLeaf(v)</code>
+函数定义了叶子节点的判定标准。例如，在排列问题中，当 <code>v</code>
+的长度等于待排列元素的数量时，<code>v</code> 就是一个叶子节点。</li>
+</ul></li>
+<li><strong>函数调用 <code>remark(v)</code></strong>：
+<ul>
+<li>这是另一个占位符函数，通常用于处理或记录找到的完整解。例如，打印解、存储解或其他处理操作。</li>
+</ul></li>
+<li><strong>获取下一个邻接节点
+<code>e = nextAdj(v, None)</code></strong>：
+<ul>
+<li><code>nextAdj(v, None)</code> 函数用于获取当前部分解 <code>v</code>
+的第一个邻接节点。对于第一个调用，<code>e</code> 通常被初始化为
+<code>None</code>。</li>
+<li>在具体问题中，邻接节点表示可以扩展当前部分解的下一个可能选择。</li>
+</ul></li>
+<li><strong>边界检查 <code>if not exceedBound(v + [e])</code></strong>：
+<ul>
+<li>检查扩展后的部分解 <code>v + [e]</code>
+是否超过了问题定义的边界条件。</li>
+<li><code>exceedBound(v + [e])</code>
+函数定义了部分解的有效性标准，如果扩展后的部分解无效，则跳过当前节点
+<code>e</code>。</li>
+</ul></li>
+<li><strong>回溯 <code>backtrack(v)</code></strong>：
+<ul>
+<li>如果所有邻接节点都处理完毕或找到一个有效解后，进行回溯操作，即从当前部分解
+<code>v</code> 中移除最后一个元素，以便返回到上一步状态。</li>
+<li><code>backtrack(v)</code> 函数通常包括从 <code>v</code>
+中删除最后一个元素，并可能进行一些其他恢复操作。</li>
+</ul></li>
+</ol>
+<p>简单来说就是通过深度优先搜索暴力地遍历完所有解的空间，期间通过边界检查剪掉不合理的分支缩小查找范围。</p>
+<h2 id="回溯法求解数独">回溯法求解数独</h2>
+<p>有了上面的铺垫，求解数独的问题可以分解为以下流程：</p>
+<ol type="1">
+<li>先判断盘面是否合理，盘面不合理就退出。</li>
+<li>试探性地在未解决的位置填入数字，并考虑下一个未解决的位置。</li>
+<li>如果下一个位置没有任何可填的数字，则回溯到上一个决策点重新决策。</li>
+<li>如果已经没有未解决的位置了，就说明已经找到解了，输出解。</li>
+</ol>
+<p>实现之后：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过回溯法求解数独的解</span></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预处理，先把盘面读进来</span></span><br><span class="line">board = [[<span class="string">&quot;5&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;1&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;5&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;3&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;4&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;1&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;7&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>],</span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;1&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;5&quot;</span>],</span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;9&quot;</span>]]</span><br><span class="line"></span><br><span class="line">n = <span class="built_in">len</span>(board)</span><br><span class="line"></span><br><span class="line">row_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">col_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">square_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 待求解的位置</span></span><br><span class="line">unknown_queue = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        num = board[i][j]</span><br><span class="line">        <span class="keyword">if</span> num == <span class="string">&quot;.&quot;</span>:</span><br><span class="line">            unknown_queue.append((i, j))</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># 先行后列再方框</span></span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> row_counter_list[i]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            row_counter_list[i].add(num)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> col_counter_list[j]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            col_counter_list[j].add(num)</span><br><span class="line">        </span><br><span class="line">        row_index = i // <span class="number">3</span></span><br><span class="line">        col_index = j // <span class="number">3</span></span><br><span class="line">        square_index = row_index * <span class="number">3</span> + col_index</span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> square_counter_list[square_index]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            square_counter_list[square_index].add(num)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">solve</span>(<span class="params">result: <span class="type">List</span>[<span class="type">List</span>[<span class="built_in">int</span>]]</span>):</span><br><span class="line">    <span class="comment"># 求解函数，result为决策序列</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(unknown_queue) == <span class="number">0</span>:</span><br><span class="line">        <span class="comment"># 这里已经找到合适的解了，输出盘面即可</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;求解完成，找到解：&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; &quot;</span>.join(board[row]))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 这里继续求解未知的数</span></span><br><span class="line">        i, j = unknown_queue[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># 定位对应的counter</span></span><br><span class="line">        row_counter = row_counter_list[i]</span><br><span class="line">        col_counter = col_counter_list[j]</span><br><span class="line">        square_counter = square_counter_list[i//<span class="number">3</span> * <span class="number">3</span> + j//<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> res <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">10</span>):</span><br><span class="line">            str_res = <span class="built_in">str</span>(res)</span><br><span class="line">            <span class="keyword">if</span> str_res <span class="keyword">in</span> row_counter <span class="keyword">or</span> str_res <span class="keyword">in</span> col_counter <span class="keyword">or</span> str_res <span class="keyword">in</span> square_counter:</span><br><span class="line">                <span class="comment"># 剪枝掉不合理的结果</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            result.append([i, j, res])</span><br><span class="line">            <span class="comment"># 更改盘面</span></span><br><span class="line">            board[i][j] = str_res</span><br><span class="line">            row_counter.add(str_res)</span><br><span class="line">            col_counter.add(str_res)</span><br><span class="line">            square_counter.add(str_res)</span><br><span class="line">            <span class="comment"># 决定后未决策队列出队</span></span><br><span class="line">            unknown_queue.pop(<span class="number">0</span>)</span><br><span class="line">            <span class="comment"># 深度搜索</span></span><br><span class="line">            solve(result)</span><br><span class="line">        </span><br><span class="line">    <span class="comment"># 回溯，这里说明要撤销上一次的决定了</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(result) &gt; <span class="number">0</span>:</span><br><span class="line">        i, j, k = result.pop()</span><br><span class="line">        str_k = <span class="built_in">str</span>(k)</span><br><span class="line">        <span class="comment"># 复原盘面</span></span><br><span class="line">        row_counter = row_counter_list[i]</span><br><span class="line">        col_counter = col_counter_list[j]</span><br><span class="line">        square_counter = square_counter_list[i//<span class="number">3</span> * <span class="number">3</span> + j//<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">        row_counter.remove(str_k)</span><br><span class="line">        col_counter.remove(str_k)</span><br><span class="line">        square_counter.remove(str_k)</span><br><span class="line"></span><br><span class="line">        board[i][j] = <span class="string">&quot;.&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 插入新求解任务</span></span><br><span class="line">        unknown_queue.insert(<span class="number">0</span>, (i, j))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;the end...&quot;</span>)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">solve([])</span><br></pre></td></tr></table></figure>
+<p>拿wiki上的题目测试一下：</p>
+<figure>
+<img src="/images/image-20240708140942130.png"
+alt="image-20240708140942130" />
+<figcaption aria-hidden="true">image-20240708140942130</figcaption>
+</figure>
+<p>可以发现结果是没问题的，再测试一道题：</p>
+<figure>
+<img src="/images/image-20240708141611945.png"
+alt="image-20240708141611945" />
+<figcaption aria-hidden="true">image-20240708141611945</figcaption>
+</figure>
+<p>结果也没有问题。</p>
+<p>然后这样，用回溯法解决数独问题的程序就写好了。</p>
+<h2 id="优化思路">优化思路</h2>
+<p>现在的代码已经可以解决数独问题了，但逻辑是通过依次向未知位置试探性填入数字做到的。这里面没有用到盘面的先验信息，每次都从最前面的未知位置开始填，填错了就回溯直到遍历完所有空间。</p>
+<p>这显然有点不符合人做数独的逻辑，人做数独肯定是要观察盘面的，不然数独题也不会有入门、简单、困难这样的难度划分。以第一个数独例子来说，如果我们按顺序先填红色箭头的位置，则可以填1，2，4三个数，这里就有3个分支。但如果我们先填蓝色箭头的位置呢？蓝色箭头的位置以及有很多约束条件了，只能填4，只有一个分支，不需要在这里进行回溯了。</p>
+<figure>
+<img src="/images/image-20240708143454561.png"
+alt="image-20240708143454561" />
+<figcaption aria-hidden="true">image-20240708143454561</figcaption>
+</figure>
+<p>问题就转化为了：如何启发式地选择决策点，使得回溯的次数最少？</p>
+<p>这样可以缩小搜索的空间，从而提升算法效率（当然回溯法最坏情况一定是指数的，这里的效率是指的回溯的次数）。</p>
+<p>其实可以看出，一个点的难易程度可以用现在可用的解空间描述。可以用一个优先队列来维护盘面信息，以解空间的大小做一个优先队列，优先弹出解空间小的未知位置做决策。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过回溯法求解数独的解</span></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预处理，先把盘面读进来</span></span><br><span class="line">board = [[<span class="string">&quot;5&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;1&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;5&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;3&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;4&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;1&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;7&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>], </span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>],</span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;1&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;5&quot;</span>],</span><br><span class="line">         [<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;.&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;9&quot;</span>]]</span><br><span class="line"></span><br><span class="line">n = <span class="built_in">len</span>(board)</span><br><span class="line"></span><br><span class="line">row_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">col_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">square_counter_list = [<span class="built_in">set</span>() <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 待求解的位置</span></span><br><span class="line">unknown_queue = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找到可行解前的回溯次数</span></span><br><span class="line">backtracing_num = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        num = board[i][j]</span><br><span class="line">        <span class="keyword">if</span> num == <span class="string">&quot;.&quot;</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># 先行后列再方框</span></span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> row_counter_list[i]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            row_counter_list[i].add(num)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> col_counter_list[j]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            col_counter_list[j].add(num)</span><br><span class="line">        </span><br><span class="line">        row_index = i // <span class="number">3</span></span><br><span class="line">        col_index = j // <span class="number">3</span></span><br><span class="line">        square_index = row_index * <span class="number">3</span> + col_index</span><br><span class="line">        <span class="keyword">if</span> num <span class="keyword">in</span> square_counter_list[square_index]:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;盘面无效!&quot;</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            square_counter_list[square_index].add(num)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里需要统计完盘面了再进行一次观察</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        num = board[i][j]</span><br><span class="line">        <span class="keyword">if</span> num == <span class="string">&quot;.&quot;</span>:</span><br><span class="line">            <span class="comment"># 计算解空间</span></span><br><span class="line">            row_index = i // <span class="number">3</span></span><br><span class="line">            col_index = j // <span class="number">3</span></span><br><span class="line">            square_index = row_index * <span class="number">3</span> + col_index</span><br><span class="line">            fs_space = <span class="number">9</span> - <span class="built_in">len</span>(row_counter_list[row_index] | col_counter_list[col_index] | square_counter_list[square_index])</span><br><span class="line">            heapq.heappush(unknown_queue, (fs_space, i, j))</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">solve</span>(<span class="params">result: <span class="type">List</span>[<span class="type">List</span>[<span class="built_in">int</span>]]</span>):</span><br><span class="line">    <span class="comment"># 求解函数，result为决策序列</span></span><br><span class="line">    <span class="keyword">global</span> backtracing_num</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(unknown_queue) == <span class="number">0</span>:</span><br><span class="line">        <span class="comment"># 这里已经找到合适的解了，输出盘面即可</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;求解完成，找到解：&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; &quot;</span>.join(board[row]))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;找到可行解前回溯次数: <span class="subst">&#123;backtracing_num&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 这里继续求解未知的数</span></span><br><span class="line">        fs_space, i, j = unknown_queue[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># 定位对应的counter</span></span><br><span class="line">        row_counter = row_counter_list[i]</span><br><span class="line">        col_counter = col_counter_list[j]</span><br><span class="line">        square_counter = square_counter_list[i//<span class="number">3</span> * <span class="number">3</span> + j//<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> res <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">10</span>):</span><br><span class="line">            str_res = <span class="built_in">str</span>(res)</span><br><span class="line">            <span class="keyword">if</span> str_res <span class="keyword">in</span> row_counter <span class="keyword">or</span> str_res <span class="keyword">in</span> col_counter <span class="keyword">or</span> str_res <span class="keyword">in</span> square_counter:</span><br><span class="line">                <span class="comment"># 剪枝掉不合理的结果</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            result.append([fs_space, i, j, res])</span><br><span class="line">            <span class="comment"># 更改盘面</span></span><br><span class="line">            board[i][j] = str_res</span><br><span class="line">            row_counter.add(str_res)</span><br><span class="line">            col_counter.add(str_res)</span><br><span class="line">            square_counter.add(str_res)</span><br><span class="line">            <span class="comment"># 决定后未决策队列出队</span></span><br><span class="line">            heapq.heappop(unknown_queue)</span><br><span class="line">            <span class="comment"># 深度搜索</span></span><br><span class="line">            solve(result)</span><br><span class="line">        </span><br><span class="line">    <span class="comment"># 回溯，这里说明要撤销上一次的决定了</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(result) &gt; <span class="number">0</span>:</span><br><span class="line">        backtracing_num += <span class="number">1</span></span><br><span class="line">        fs_space, i, j, k = result.pop()</span><br><span class="line">        str_k = <span class="built_in">str</span>(k)</span><br><span class="line">        <span class="comment"># 复原盘面</span></span><br><span class="line">        row_counter = row_counter_list[i]</span><br><span class="line">        col_counter = col_counter_list[j]</span><br><span class="line">        square_counter = square_counter_list[i//<span class="number">3</span> * <span class="number">3</span> + j//<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">        row_counter.remove(str_k)</span><br><span class="line">        col_counter.remove(str_k)</span><br><span class="line">        square_counter.remove(str_k)</span><br><span class="line"></span><br><span class="line">        board[i][j] = <span class="string">&quot;.&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 插入新求解任务</span></span><br><span class="line">        heapq.heappush(unknown_queue, (fs_space, i, j))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;the end...&quot;</span>)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">solve([])</span><br></pre></td></tr></table></figure>
+<p>主要区别就是通过<code>fs_space</code>变量来考虑初始盘面信息了，先从可填的解少的地方开始填起。</p>
+<p>为了比较优化前后的区别，通过<code>backtracing_num</code>来记录找到可行解前的回溯次数。同样求解示例1和示例2，打印优化前后的回溯次数：</p>
+<figure>
+<img src="/images/image-20240708150857736.png"
+alt="image-20240708150857736" />
+<figcaption aria-hidden="true">image-20240708150857736</figcaption>
+</figure>
+<figure>
+<img src="/images/image-20240708151114894.png"
+alt="image-20240708151114894" />
+<figcaption aria-hidden="true">image-20240708151114894</figcaption>
+</figure>
+<p>可以看到，对于案例1回溯次数减少到原来的1/4，而案例2则减少到原来的近1/20了。这说明考虑盘面信息先验可以有效地减少回溯的次数。</p>
+<p>但代价是什么呢？构建和维护这样的优先队列也是要时间的。但好在构建优先队列大约花费O(nlog
+n)复杂度，而每次回溯把元素插回去消耗O(log
+n)复杂度，相比指数复杂度影响不大。（n是待求解元素总数）</p>
+<p>也可能会进一步地想，要是每次决策也同时考虑这次决策给其他未求解格子的可行解空间造成影响，动态考虑盘面可不可行呢？应该也是可行的，倒不如说这样更符合人类的决策习惯。但是优先队列一个问题就是插入元素后不好更改优先级，会破坏堆结构内部的顺序。如果不用堆结构，那每次获取待决策位置都会产生开销，这里有点不好。</p>
+<p>因此，为了整体结构的简洁性，放弃动态考虑整体盘面，而是直接初始盘面用到最后。</p>
+<h2 id="总结">总结</h2>
+<p>通过数独求解，回顾了回溯法的流程和编程框架。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/07/08/%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC%E9%97%AE%E9%A2%98/">https://lisheng2001.github.io/2024/07/08/回溯法求解数独问题/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9B%9E%E6%BA%AF%E6%B3%95/">回溯法</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/07/26/%E7%BB%88%E7%AB%AF%E5%85%B3%E9%97%AD%E5%90%8E%E7%BB%A7%E7%BB%AD%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E7%9A%84%E6%96%B9%E6%B3%95/" title="终端关闭后继续执行命令的方法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">终端关闭后继续执行命令的方法</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/" title="细节处见真章——LLM中的tokenizer"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">细节处见真章——LLM中的tokenizer</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E6%BA%AF%E6%B3%95%E5%8F%8A%E6%A1%86%E6%9E%B6"><span class="toc-number">2.</span> <span class="toc-text">回溯法及框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E6%BA%AF%E6%B3%95%E6%B1%82%E8%A7%A3%E6%95%B0%E7%8B%AC"><span class="toc-number">3.</span> <span class="toc-text">回溯法求解数独</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="toc-number">4.</span> <span class="toc-text">优化思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

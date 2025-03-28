@@ -1,0 +1,666 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>LLM评估 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="目前，大语言模型（LLM）已经变得非常复杂。在万亿（Trillion, T）量级的token上进行了预训练，并且进行了SFT、RLHF等精密的后训练，LLM表现出了很强的指令遵循能力。 然而，在生产环境中，可能仍然有一些bad case需要修复。另外，出于成本考虑，在保证性能可接受的前提下会用尽可能小的模型来降低推理成本。 这使得业务场景下LLM微调的需求很旺盛。构造一份目标任务的数据集，微调让L">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM评估">
+<meta property="og:url" content="https://lisheng2001.github.io/2025/01/04/LLM%E8%AF%84%E4%BC%B0/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="目前，大语言模型（LLM）已经变得非常复杂。在万亿（Trillion, T）量级的token上进行了预训练，并且进行了SFT、RLHF等精密的后训练，LLM表现出了很强的指令遵循能力。 然而，在生产环境中，可能仍然有一些bad case需要修复。另外，出于成本考虑，在保证性能可接受的前提下会用尽可能小的模型来降低推理成本。 这使得业务场景下LLM微调的需求很旺盛。构造一份目标任务的数据集，微调让L">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2025-01-04T12:45:23.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.427Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="大语言模型">
+<meta property="article:tag" content="模型评估">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2025/01/04/LLM%E8%AF%84%E4%BC%B0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'LLM评估',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">LLM评估</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.427Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="LLM评估"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>目前，大语言模型（LLM）已经变得非常复杂。在万亿（Trillion,
+T）量级的token上进行了预训练，并且进行了SFT、RLHF等精密的后训练，LLM表现出了很强的指令遵循能力。</p>
+<p>然而，在生产环境中，可能仍然有一些bad
+case需要修复。另外，出于成本考虑，在保证性能可接受的前提下会用尽可能小的模型来降低推理成本。</p>
+<p>这使得业务场景下LLM微调的需求很旺盛。构造一份目标任务的数据集，微调让LLM对其中的示例进行拟合可以很直接地修复bad
+case，并使得参数量较小的模型快速提升目标任务的性能。然而，微调一方面拟合了目标任务数据集中的示例，另一方面又存在过拟合、灾难性遗忘等风险，可能影响模型在目标任务上的综合表现。为了趋利避害，建立完善的评估机制来最大化微调后模型的收益，最小化风险非常重要。</p>
+<p>目前有一些框架已经能够处理LLM的评估了： 1. <a
+target="_blank" rel="noopener" href="https://github.com/huggingface/evaluate">Evaluate</a> 2. <a
+target="_blank" rel="noopener" href="https://github.com/explodinggradients/ragas">RAGAs</a> 3. <a
+target="_blank" rel="noopener" href="https://github.com/openai/evals">evals</a> 4. <a
+target="_blank" rel="noopener" href="https://github.com/EleutherAI/lm-evaluation-harness">lm-evaluation-harness</a>（推荐）
+5. <a target="_blank" rel="noopener" href="https://github.com/argilla-io/argilla">Argilla</a></p>
+<p>这些框架基本都能处理一些简单的LLM评估，但侧重于不同方面，也基本都有着一些独特的优势和局限性。</p>
+<h2 id="evaluate">Evaluate</h2>
+<p><code>Evaluate</code>是huggingface官方推出的评估库，用来轻松评估机器学习模型和数据集。优点是：</p>
+<ol type="1">
+<li><p>huggingface官方评估库，和huggingface的训练框架集成度高，指标评估流程可以直接集成进行训练流程。</p></li>
+<li><p>指标多，考虑的方面更全。<code>Evaluate</code>提供了<code>Metric</code>、<code>Comparison</code>、<code>Measurement</code>三个概念。其中Metric用于评估模型性能，并且对常用的评估指标提供了现成的脚本去计算。Comparison用于比较两个模型，有些指标并无绝对好坏，但通过比较可以区分模型的性能。比如常用的困惑度就是一个表达相对好坏的指标，并无一个确切地阈值来表征对或不对，但对于正确答案困惑度相对较低的模型一般性能更好。Measurement用于评价数据集的质量。比如文本重复度、标签分布等。</p>
+<p>从模型和数据集两个方面来进行评估考虑，并且模型评估时考虑了绝对指标和相对指标。</p></li>
+<li><p>支持任务广泛。不仅支持传统的分类任务，还支持NLP、CV等领域的多种分类任务。</p></li>
+</ol>
+<p>因为这里讨论的是关于LLM的评估，当然其缺点也很明显：</p>
+<ol type="1">
+<li>因为其针对的是更宽泛的机器学习评估，所以对LLM评估没有过多优化。对于数据集加载、LLM调用、结果提取、超时重试处理等都需要自己编写代码，会比较复杂。</li>
+<li>加载指标需要连接huggingface官网，可能由于网络原因连接失败。</li>
+</ol>
+<p>总的来说，<code>Evaluate</code>实现了评估的一些基本功能，但除非是想开发一套完全透明的LLM评估框架，否则一般有更好的选择。</p>
+<h2 id="ragas">RAGAs</h2>
+<p>RAGAS（<strong>R</strong>etrieval <strong>A</strong>ugmented
+<strong>G</strong>eneration
+<strong>As</strong>sessment）是专用于自动化评估检索增强（RAG）系统的评估框架，算是一个特化的LLM开源评估工具。</p>
+<p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.15217">RAGAS: Automated
+Evaluation of Retrieval Augmented Generation</a></p>
+<p>项目地址：<a
+target="_blank" rel="noopener" href="https://github.com/explodinggradients/ragas">RAGAs</a></p>
+<p>RAGAs专注于RAG系统的评估，并且和需要GT的评估不同，它甚至可以在没有人工标注的情况下完成RAG系统的评估。其核心为3个性能指标：忠实性、答案相关性和上下文相关性。</p>
+<h3 id="忠实性">忠实性</h3>
+<p>忠实性指的是答案应基于给定的上下文。这对于避免幻觉并确保检索到的上下文可以作为生成答案的正当性依据非常重要。通俗地讲，就是不管检索出来什么事实，在RAG系统中LLM就应该根据这个检索出来的事实回答问题，而不是自作主张地变更。比如检索出来<code>0的0次方是0</code>的事实，那在回答问题<code>0的0次方的值是什么？</code>时，LLM就不应该回答无意义，而应该根据检索出来的事实回答是0。</p>
+<p>它的评估依赖gpt-3.5模型的提示学习能力。如果答案<span
+class="math inline">\(a_s(q)\)</span>中的陈述可以从上下文<span
+class="math inline">\(c(q)\)</span>中推断出来，我们就说该答案忠实于上下文。为了估计忠实性，我们首先使用
+LLM提取一组陈述<span
+class="math inline">\(S(a_s(q))\)</span>。作者使用以下提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">给定一个问题和一个答案，从给定答案的每个句子中创建一个或多个陈述。</span><br><span class="line">问题: [question]</span><br><span class="line">答案: [answer]</span><br></pre></td></tr></table></figure>
+<p>其中 [question] 和 [answer] 指的是给定的问题和答案。对于<span
+class="math inline">\(S\)</span>中的每个陈述<span
+class="math inline">\(s_i\)</span>，LLM 使用验证函数<span
+class="math inline">\(v(s_i, c(q))\)</span>确定<span
+class="math inline">\(s_i\)</span>是否可以从<span
+class="math inline">\(c(q)\)</span>中推断出来。这个所谓的验证函数其实也是通过提示驱动gpt-3.5完成的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">考虑给定的上下文和以下陈述，然后确定它们是否被上下文中的信息所支持。在得出结论（是/否）之前，为每个陈述提供简要解释。最后按照指定</span><br><span class="line">格式依次给出每个陈述的最终结论。</span><br><span class="line">不要偏离指定的格式。</span><br><span class="line">陈述: [陈述 1]</span><br><span class="line">...</span><br><span class="line">陈述: [陈述 n]</span><br></pre></td></tr></table></figure>
+<p>最终的忠实度分数<span class="math inline">\(F\)</span>计算为： <span
+class="math display">\[
+F=\frac{|V|}{|S|}
+\]</span> 其中，<span
+class="math inline">\(|V|\)</span>是LLM认为被上下文信息支持的陈述的数量，<span
+class="math inline">\(|S|\)</span>是陈述的总数。</p>
+<h3 id="答案相关性">答案相关性</h3>
+<p>如果答案<span
+class="math inline">\(a_s(q)\)</span>以适当的方式直接回答了问题，我们就说答案是相关的。这里评估答案相关性的方式不是直接问LLM答案和问题是否相关，而是转了一手，先让LLM根据答案生成可能的问题，然后根据这些生成的问题与原问题的相关性分数来衡量答案相关性。这里可能是想剥离问题本身和答案的对应关系，即答案是不是正确的这里是不考虑的。如果直接问答案和问题是否相关，则可能受到答案本身是否正确的特性影响，如果生成对应的问题后再计算相关性就能规避。</p>
+<p>首先，利用提示学习对答案<span
+class="math inline">\(a_s(q)\)</span>生成<span
+class="math inline">\(n\)</span>个可能的问题<span
+class="math inline">\(q_i\)</span>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">为给定的答案生成一个问题。</span><br><span class="line">答案: [答案]</span><br></pre></td></tr></table></figure>
+<p>然后使用openai的嵌入模型（原论文中使用的是text-embedding-ada-002，现在有更新的了）为所有问题生成嵌入。对所有生成的问题<span
+class="math inline">\(q_i\)</span>与原始问题<span
+class="math inline">\(q\)</span>的嵌入计算余弦相似度，作为两个问题之间的相似度<span
+class="math inline">\(sim(q_i,q)\)</span>。最后问题问题<span
+class="math inline">\(q\)</span>与答案<span
+class="math inline">\(a_s(q)\)</span>的答案相关性<span
+class="math inline">\(AR\)</span>： <span class="math display">\[
+AR=\frac{1}{n}sim(q_i,q)
+\]</span></p>
+<h3 id="上下文相关性">上下文相关性</h3>
+<p>如果上下文中包含了回答问题所需要的信息，则上下文被认为是相关的，并且冗余信息越少，相关性越高。上下文相关性目的是惩罚上下文中包含的冗余信息。为了估计上下文相关性，给定一个问题<span
+class="math inline">\(q\)</span>及其上下文<span
+class="math inline">\(c(q)\)</span>，LLM 从<span
+class="math inline">\(c(q)\)</span>中提取一个句子子集<span
+class="math inline">\(S_{ext}\)</span>，这些句子对回答<span
+class="math inline">\(q\)</span>至关重要，使用以下提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">请从提供的上下文中提取可能有助于回答以下问题的相关句子。如果未找到相关句子，或者您认为无法从给定上下文中回答问题，请返回“信息不足”。在提取候选句子时，您不得对给定上下文中的句子进行任何更改。</span><br></pre></td></tr></table></figure>
+<p>之后根据候选句子的数量计算上下文相关性<span
+class="math inline">\(CR\)</span>： <span class="math display">\[
+CR = \frac{候选句子数量}{c(q)中句子的总数量}
+\]</span></p>
+<h3 id="方法效果">方法效果</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Faith.</th>
+<th>Ans. Rel.</th>
+<th>Cont. Rel.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RAGAs</td>
+<td><strong>0.95</strong></td>
+<td><strong>0.78</strong></td>
+<td><strong>0.70</strong></td>
+</tr>
+<tr class="even">
+<td>GPT Score</td>
+<td>0.72</td>
+<td>0.52</td>
+<td>0.63</td>
+</tr>
+<tr class="odd">
+<td>GPT Ranking</td>
+<td>0.54</td>
+<td>0.40</td>
+<td>0.52</td>
+</tr>
+</tbody>
+</table>
+<p>Table 1: 在使用 WikEval
+数据集进行成对比较时，与人工标注者在忠实性、答案相关性和上下文相关性方面的一致性（准确率）。</p>
+<p>上表展示了RAGAs在作者提出的WikEval数据集上与人工评估的相关性。可以看到相比GPT
+Score和GPT
+Ranking这两种基线方法，RAGAs的效果都要好。尤其在忠实性方面已经做到开箱可用的程度了。</p>
+<p>但答案相关性和上下文相关性仍然不那么好。对于答案相关性，作者解释是：</p>
+<blockquote>
+<p>对于答案相关性，一致性较低，但这主要是由于两个候选答案之间的差异通常非常微妙。</p>
+</blockquote>
+<p>但我感觉问题在使用语义嵌入余弦相似度来判断生成问题<span
+class="math inline">\(q_i\)</span>和原问题<span
+class="math inline">\(q\)</span>之间的语义相似度，因为语义嵌入本来就是一个相对粗粒度的指标，对于从一个大集合中快速召回一个小集合，这种方式很高效。但更细粒度的操作一般不会直接操作语义嵌入的，因为精度有限。计算<span
+class="math inline">\(AR\)</span>时如果也使用提示学习进行打分会不会更好？</p>
+<p>对上下文相关性，作者解释是：</p>
+<blockquote>
+<p>我们发现上下文相关性是最难评估的质量维度。特别是，我们观察到 ChatGPT
+在选择上下文中关键句子的任务上常常遇到困难，尤其是对于较长的上下文。</p>
+</blockquote>
+<p>这是在说gpt-3.5在指令遵循方面有问题吗？也许原来的方法不变，人为地在每个句子前标个序号，让LLM挑出与问题相关的句子序号集合会更简单一些。（这个可以参考一下这篇文章：<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2310.11441">Set-of-Mark Prompting Unleashes
+Extraordinary Visual Grounding in
+GPT-4V</a>，同样的视觉任务，如果能有预先分割的物体标号效果就会更好）</p>
+<p>因为token很多，直接复述上下文LLM确实会出现一些偏移导致匹配失败。现在有4o这样更好的模型，指令遵循能力应该更好，选择关键句子的困难应该会缓解一些。</p>
+<p>总的来说，RAGAs的几个指标非常有参考意义，而且因为不需要参考答案，实战价值也很高。其实这个RAGAs就很多地用了LLM-as-a-Judge的概念，并且结合了RAG的流程进行了充分的设计，因此相比基线得到更好的结果也是可以预见的。</p>
+<h3 id="对我的启发">对我的启发</h3>
+<p>这一节其实和LLM评估没太大关系，主要是想起来之前面试时有问到“你觉得RAG系统里面最重要的部分是什么？”。我当时想这个问题真有点宽泛，一个RAG系统，有数据收集处理、分块、索引、召回、排序、增强生成这么多步骤，里面每一步都可能会影响到最后结果，我也很难说最重要的是什么。我当时硬答的是“分块最重要“，主要是当时觉得按字符数量/token数量+重叠的分块虽然有效，但没怎么考虑语义连贯性。加上当时又有进行语义chunking的一些尝试，所以也就这么讲了。但现在回想起来也挺片面的，因为分块的问题毕竟属于边界问题，能妥善解决当然最好。不能就按指定大小硬切其实也未必RAG的效果就不好，因为文档它就不一定有那么强的语义连贯性。属于是捡芝麻丢西瓜了。</p>
+<p>回顾一下整个RAG系统，其实是一个流程（这样的流程有个比较潮的词叫工作流，workflow）固定的Agent系统。首先，数据收集处理里面，一般可能会出现多种数据源提取信息，比如从pdf、word等里面提取信息的需求。这里面就涉及到文本结构化信息的保留、表格怎么无损提取、图表（这里指柱状图、饼状图这样的chart）的信息怎么进行转换的问题。其次，入库前需要把长文档分成小片进行索引。分片的时候即使按照最简单的字符数量+重叠字符数来进行分片，也至少有2个超参数，而且实践中这俩超参数对RAG的效果影响还挺显著的。索引大概分为稀疏索引（如TF-IDF、BM25等）和密集索引（也就是各种嵌入模型生成的嵌入）两种，前者可以实现精确搜索，后者能召回语义相似的片段，注重效果的系统里一般是两者一起上。再后面就是召回，刚才说了一般就是多路召回，稀疏索引和密集索引一起用上，尽量保证召回率。再之后就是排序，排序一种是根据问题和内容精排，嵌入模型的嵌入计算余弦相似度的粒度还是太粗，要那种同时能看到问题和上下文的模型打分就会准很多，比如<a
+target="_blank" rel="noopener" href="https://github.com/stanford-futuredata/ColBERT">ColBERT</a>。另外一种就是大模型对于不同位置的上下文关注度不一样，最重要的信息需要放到开头和结尾，可以参考：<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2307.03172">Lost in the Middle: How Language
+Models Use Long
+Contexts</a>。最后还有增强生成，模型友好的prompt是一方面，如果prompt实在解决不了，还得微调LLM。</p>
+<p>这里面每一步都有不少可选项，如果都实施一遍可能黄花菜都凉了系统还没搭起来。而且如提取表格、转换图表甚至转换图像信息是非常复杂的，成本可能很高。字符数量+重叠字符数来进行分片需要实验验证。在这么一套复杂系统里，请问什么最重要？</p>
+<p>我现在认为是评估。RAG系统说到底还是讲究收益的系统，如果对于评估的大部分case能通过，那么他即使有弱点有corner
+case，但仍然是很有用的系统。所以如何建立和真实业务表现强相关的评估才是RAG里最重要的事情，根据现有的bad
+case，确定解决方案，定向地优化RAG系统是提升投入产出比的重要途径。所以让我现在回答，我会说是评估，通过评估确定基线系统的性能，之后分析bad
+case进行定向优化。</p>
+<h2 id="evals">evals</h2>
+<p><code>evals</code>是openai官方的LLM评估库。<code>evals</code>提供了一个框架，用于评估大型语言模型（LLMs）或使用LLMs构建的系统。其提供了一个现有的评估注册表，以测试OpenAI模型的不同维度，并允许使用自有用例编写自定义评估。还可以使用自己的数据构建私有评估，这些评估代表了您工作流程中常见的LLMs模式，而无需公开任何数据。</p>
+<p>如果您正在使用LLMs进行构建，创建高质量的评估是您可以做的最有影响力的事情之一。没有<code>evals</code>，理解不同模型版本可能如何影响您的用例可能会非常困难和耗时。正如openai的ceo所说：</p>
+<blockquote>
+<p>evals are surprisingly often all you need. ——openai ceo Greg
+Brockman</p>
+</blockquote>
+<p>本文一开始就是为<code>evals</code>这个碟醋包的这盘饺子，但深入了解之后感觉这个库还是不如后面要谈的<code>lm-evaluation-harness</code>通用，因此后面的实操还是使用的<code>lm-evaluation-harness</code>库。</p>
+<p>当然，这个库还是有一些亮点值得借鉴：</p>
+<ol type="1">
+<li>对于支持OpenAI的库调用的大模型来说，需要自己编写的代码很少，一般只需要按格式准备好数据的jsonl即可。</li>
+<li>提供了3个由模型进行评分的评估（model-graded
+evals）模板，对使用LLM进行评估打分很有启发。</li>
+</ol>
+<p>缺点就是只支持自家的OpenAI模型，对于本地跑的模型可能需要添加额外的转换层。然后对评估数据管理比较粗放，jsonl对文本数据可能还没啥，如果之后要进行多模态评估可能就比较麻烦。</p>
+<p>接下来将从评估数据准备、评估指标说明和运行评估3个维度说明这个库的使用。</p>
+<h3 id="评估数据准备">评估数据准备</h3>
+<p>基本是需要在评估之前将数据格式化为每行为包含<code>input</code>和<code>ideal</code>的字典的<code>jsonl</code>格式。<code>input</code>字段包含输入给LLM的必要信息，包含对任务的解释说明、任务示例（可选）和待处理的数据，并且格式化为<code>system</code>,
+<code>user</code>以及<code>assistant</code>三者的组合。在openai官方的示例中，基本只需要发送带<code>system</code>角色的消息即可。<code>ideal</code>字段则根据所要评估的指标不同而有所区别，可以输入单个参考答案，也可以以列表形式输入多个参考答案。以下是示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;input&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;system&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;You are on an island populated by two tribes. Members of one tribe consistently lie. Members of the other tribe always tell the truth. Tribe members can recognize one another, but you can&#x27;t tell them apart. You meet two people, C and D on the island. C says, &#x27;Exactly one of us is from the liars tribe.&#x27; Which tribe is D from?&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;ideal&quot;</span><span class="punctuation">:</span><span class="string">&quot;D is from the Liars tribe.&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;input&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;system&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;There are five people in a room. Each person will either always tell the truth or always tell a lie. Each person is asked the following question: How many liars are among you? The answers are: \&quot;one\&quot;, \&quot;two\&quot;, \&quot;three\&quot;, \&quot;four\&quot;, \&quot;five\&quot;. How many liars are in the room?&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;ideal&quot;</span><span class="punctuation">:</span><span class="string">&quot;There are four liars.&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>准备好这样格式的jsonl文件后，则需要将该任务注册到<code>evals</code>库中。所谓注册就是编写指定格式的yaml文件到<code>evals/registry/evals/&lt;eval_name&gt;.yaml</code>路径下。示例如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&lt;eval_name&gt;:</span></span><br><span class="line">  <span class="attr">id:</span> <span class="string">&lt;eval_name&gt;.dev.v0</span></span><br><span class="line">  <span class="attr">description:</span> <span class="string">&lt;description&gt;</span></span><br><span class="line">  <span class="attr">metrics:</span> [<span class="string">accuracy</span>]</span><br><span class="line"></span><br><span class="line"><span class="string">&lt;eval_name&gt;.dev.v0:</span></span><br><span class="line">  <span class="attr">class:</span> <span class="string">evals.elsuite.basic.match:Match</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">    <span class="attr">samples_jsonl:</span> <span class="string">&lt;eval_name&gt;/samples.jsonl</span></span><br></pre></td></tr></table></figure>
+<p>evals
+的命名约定采用以下形式<code>&lt;eval_name&gt;.&lt;split&gt;.&lt;version&gt;</code>。</p>
+<ul>
+<li><code>&lt;eval_name&gt;</code>是评估名称，用于对分数可比较的评估进行分组。</li>
+<li><code>&lt;split&gt;</code>是数据分割，用于进一步对同一下的评估进行分组<code>&lt;base_eval&gt;</code>。例如，用于测试的“val”、“test”或“dev”。</li>
+<li><code>&lt;version&gt;</code>是 eval
+的版本，可以是任何您想要使用的描述性文本（但最好不包含<code>.</code>）。</li>
+</ul>
+<p>一般而言，针对同一模型运行相同的评估名称应始终产生类似的结果，以便其他人可以重现它。因此，当您更改评估时，应该更改版本。</p>
+<h3 id="评估指标">评估指标</h3>
+<p>评估指标这部分基础评估指标（Basic
+eval）和由模型进行评分的评估（model-graded evals）指标。</p>
+<p>基础评估指标主要用来评估多项选择题或者判断题这种答案相对固定的题目。在所需模型响应变化很小的情况下，例如回答多项选择题或具有直接答案的简单问题，我们发现以下模板很有用。</p>
+<p>对于模型完成<code>a</code>和正确答案的参考列表<code>B</code>，以下评估实现：</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://github.com/openai/evals/blob/main/evals/elsuite/basic/match.py"><code>basic/match.py:Match</code></a>：<code>any([a.startswith(b) for b in B])</code></li>
+<li><a
+target="_blank" rel="noopener" href="https://github.com/openai/evals/blob/main/evals/elsuite/basic/includes.py"><code>basic/includes.py:Includes</code></a>：<code>any([(b in a) for b in B])</code></li>
+<li><a
+target="_blank" rel="noopener" href="https://github.com/openai/evals/blob/main/evals/elsuite/basic/fuzzy_match.py"><code>basic/fuzzy_match.py:FuzzyMatch</code></a>：<code>any([(a in b or b in a) for b in B])</code></li>
+</ul>
+<p>也即<code>Match</code>、<code>Include</code>和<code>FuzzyMatch</code>三种基础评估实现。</p>
+<p>对于由模型进行评分的评估，<code>evals</code>库给了几种评估模板，在<code>evals/registry/modelgraded</code>目录下。其中有3种非常常用，我觉得有必要单独拿出来讲一下，对LLM-as-a-Judge还是比较有启发的。</p>
+<h4 id="fact">fact</h4>
+<p>事实一致性评估，给定完成<code>a</code>和参考答案<code>b</code>，返回：</p>
+<ul>
+<li><code>"A"</code>如果<code>a</code> ⊆
+<code>b</code>，即提交的答案是专家答案的子集，并且与专家答案完全一致。</li>
+<li><code>"B"</code>如果<code>a</code> ⊇
+<code>b</code>，即提交的答案是专家答案的超集，并与其完全一致。</li>
+<li><code>"C"</code>如果<code>a</code> =
+<code>b</code>，即提交的答案包含与专家答案相同的所有细节。</li>
+<li><code>"D"</code>如果<code>a</code> ≠
+<code>b</code>，即提交的答案与专家的答案存在分歧。</li>
+<li><code>"E"</code>如果<code>a</code> ≈
+<code>b</code>，即答案有所不同，但从事实性的角度来看，这些差异并不重要。</li>
+</ul>
+<p>这样的评估是如何完成的呢？其实是通过提示工程驱动LLM完成打分的，我们可以看一下fact指标的yaml配置文件，将prompt翻译为中文以便理解，为了便于说明也将默认参数补上了：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">fact:</span></span><br><span class="line">  <span class="attr">prompt:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">    你正在对比一个提交的答案与一个专家答案，以下是相关数据：</span></span><br><span class="line"><span class="string">    [数据开始]</span></span><br><span class="line"><span class="string">    ************</span></span><br><span class="line"><span class="string">    [问题]: &#123;input&#125;</span></span><br><span class="line"><span class="string">    ************</span></span><br><span class="line"><span class="string">    [专家]: &#123;ideal&#125;</span></span><br><span class="line"><span class="string">    ************</span></span><br><span class="line"><span class="string">    [提交]: &#123;completion&#125;</span></span><br><span class="line"><span class="string">    ************</span></span><br><span class="line"><span class="string">    [数据结束]</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">    <span class="string">请比较提交的答案与专家答案的事实内容，忽略在风格、语法或标点上的差异。</span></span><br><span class="line">    <span class="string">提交的答案可能是专家答案的子集或超集，也可能与其冲突。确定具体情况，并从以下选项中选择一个作为答案：</span></span><br><span class="line">    <span class="string">(A)</span> <span class="string">提交的答案是专家答案的子集，并且与其完全一致。</span></span><br><span class="line">    <span class="string">(B)</span> <span class="string">提交的答案是专家答案的超集，并且与其完全一致。</span></span><br><span class="line">    <span class="string">(C)</span> <span class="string">提交的答案包含了与专家答案完全相同的细节。</span></span><br><span class="line">    <span class="string">(D)</span> <span class="string">提交的答案与专家答案之间存在不一致之处。</span></span><br><span class="line">    <span class="string">(E)</span> <span class="string">答案之间存在差异，但这些差异在事实性角度上无关紧要。</span></span><br><span class="line">  <span class="attr">choice_strings:</span> <span class="string">ABCDE</span></span><br><span class="line">  <span class="attr">eval_type:</span> <span class="string">cot_classify</span></span><br><span class="line">  <span class="attr">input_outputs:</span></span><br><span class="line">    <span class="attr">input:</span> <span class="string">completion</span></span><br></pre></td></tr></table></figure>
+<p>其实可以从prompt看出这就是让LLM继续做一个选择题，从而评估提交的答案和GT的关系。但LLM只是个语言模型，是如何做选择题的呢？实际上这也就是在prompt后面补一段话，然后利用LLM的指令遵循能力做选择题的。通过指定<code>eval_type</code>这个参数来决定在原prompt后面添加什么指令：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ANSWER_PROMPTS = &#123;</span><br><span class="line">    <span class="comment"># e.g. &quot;Yes&quot;</span></span><br><span class="line">    <span class="string">&quot;classify&quot;</span>: <span class="string">&quot;Answer the question by printing only a single choice from &#123;choices&#125; (without quotes or punctuation) corresponding to the correct answer with no other text.&quot;</span>.strip(),</span><br><span class="line">    <span class="comment"># e.g. &quot;Yes\n The reasons are: ...&quot;</span></span><br><span class="line">    <span class="string">&quot;classify_cot&quot;</span>: <span class="string">&quot;First, answer by printing a single choice from &#123;choices&#125; (without quotes or punctuation) corresponding to the correct answer. Then, from the next line, explain your reasonings step by step.&quot;</span>.strip(),</span><br><span class="line">    <span class="comment"># e.g. &quot;Let&#x27;s think step by step. ...\nYes&quot;</span></span><br><span class="line">    <span class="string">&quot;cot_classify&quot;</span>: <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">First, write out in a step by step manner your reasoning to be sure that your conclusion is correct. Avoid simply stating the correct answer at the outset. Then print only a single choice from &#123;choices&#125; (without quotes or punctuation) on its own line corresponding to the correct answer. At the end, repeat just the answer by itself on a new line.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Reasoning:&quot;&quot;&quot;</span>.strip()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大概就这三种参数，官方推荐的是<code>cot_classify</code>，因为毕竟是自回归模型，只有先输出原因后面做决策的时候才能进行参考，一般来说也是<code>cot_classify</code>效果最好。然后后面和<code>get_choice</code>函数一配合就能选出答案了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_choice</span>(<span class="params"></span></span><br><span class="line"><span class="params">    text: <span class="built_in">str</span>, eval_type: <span class="built_in">str</span>, match_fn: <span class="type">Union</span>[<span class="built_in">str</span>, <span class="type">Callable</span>], choice_strings: Iterable[<span class="built_in">str</span>]</span></span><br><span class="line"><span class="params"></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;Clean the answer string to a choice string to one of choice_strings. Return &#x27;__invalid__.&#x27; if no match.&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(match_fn, <span class="built_in">str</span>):</span><br><span class="line">        match_fn = MATCH_FNS[match_fn]</span><br><span class="line">    lines = text.strip().split(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> eval_type.startswith(<span class="string">&quot;cot_classify&quot;</span>):</span><br><span class="line">        lines = lines[::-<span class="number">1</span>]  <span class="comment"># reverse lines</span></span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">        line = line.strip()</span><br><span class="line">        line = <span class="string">&quot;&quot;</span>.join(c <span class="keyword">for</span> c <span class="keyword">in</span> line <span class="keyword">if</span> c <span class="keyword">not</span> <span class="keyword">in</span> string.punctuation)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">for</span> choice <span class="keyword">in</span> choice_strings:</span><br><span class="line">            <span class="keyword">if</span> match_fn(line, choice):</span><br><span class="line">                <span class="keyword">return</span> choice</span><br><span class="line">    logging.warn(<span class="string">f&quot;Choices <span class="subst">&#123;choice_strings&#125;</span> not parsable for <span class="subst">&#123;eval_type&#125;</span>: <span class="subst">&#123;text&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> INVALID_STR</span><br></pre></td></tr></table></figure>
+<p>这里面还有一个比较有意思的参数<code>choice_scores</code>，这个可以不填，不填的效果就类似于我们做多项选择题，如果做对了就得分，做错了不管选啥都得0分。但是对模型评估来讲，如果是非常离谱的答案可能需要更重的惩罚，比如这里的事实检验任务，如果是<code>C</code>应该得最高分，<code>E</code>和<code>C</code>相同，而<code>A</code>则是回答存在冗余，但都比<code>D</code>得分要高，因此在计分时可以考虑对<code>D</code>分配低分数，来达到差异化评估的效果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_choice_score</span>(<span class="params"></span></span><br><span class="line"><span class="params">    choice: <span class="built_in">str</span>,</span></span><br><span class="line"><span class="params">    choice_strings: Iterable[<span class="built_in">str</span>],</span></span><br><span class="line"><span class="params">    choice_scores: <span class="type">Optional</span>[<span class="type">Union</span>[<span class="built_in">dict</span>[<span class="built_in">str</span>, <span class="built_in">float</span>], <span class="built_in">str</span>]] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params"></span>) -&gt; <span class="type">Optional</span>[<span class="built_in">float</span>]:</span><br><span class="line">    <span class="keyword">if</span> choice_scores <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">if</span> choice_scores == <span class="string">&quot;from_strings&quot;</span>:</span><br><span class="line">        choice_scores = &#123;c: <span class="built_in">float</span>(c) <span class="keyword">for</span> c <span class="keyword">in</span> choice_strings&#125;</span><br><span class="line">    <span class="comment"># assumption: each INVALID_STR contributes the lowest score</span></span><br><span class="line">    <span class="keyword">if</span> choice == INVALID_STR:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">min</span>(choice_scores.values())</span><br><span class="line">    <span class="keyword">return</span> choice_scores[choice]</span><br></pre></td></tr></table></figure>
+<p>对fact指标可以观察其各选项占比来生成最后报告：</p>
+<p><strong>高 A, C 类占比</strong>：</p>
+<ul>
+<li>系统生成的答案整体准确性高。</li>
+</ul>
+<p><strong>高 B 类占比</strong>：</p>
+<ul>
+<li>系统倾向于生成超集答案，可能是冗余信息较多。</li>
+</ul>
+<p><strong>高 D 类占比</strong>：</p>
+<ul>
+<li>系统在事实性一致性方面有显著问题，需要重点优化。</li>
+</ul>
+<p><strong>高 E 类占比</strong>：</p>
+<ul>
+<li>系统生成的答案差异较小，但可能需要更严格的评估标准。</li>
+</ul>
+<h4 id="closeqa">closeqa</h4>
+<p>closeqa是一个问答评估模板，其中在提供包含问题和回答问题所需信息的提示的情况下，检查模型的回答是否：</p>
+<ul>
+<li>相关（relevant）：即从提示中提供的信息中提取；</li>
+<li>简洁（concise）：即不包含不必要的细节或信息；</li>
+<li>正确（correct）：即使用提取的信息得出正确的结论。</li>
+</ul>
+<p>同样也是通过提示工程实现的，也贴出对应的yaml文件：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">closedqa:</span></span><br><span class="line">  <span class="attr">prompt:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">    你正在根据给定的标准评估一个提交的答案。以下是数据：</span></span><br><span class="line"><span class="string">    [数据开始]</span></span><br><span class="line"><span class="string">    ***</span></span><br><span class="line"><span class="string">    [任务]: &#123;input&#125;</span></span><br><span class="line"><span class="string">    ***</span></span><br><span class="line"><span class="string">    [提交内容]: &#123;completion&#125;</span></span><br><span class="line"><span class="string">    ***</span></span><br><span class="line"><span class="string">    [标准]: &#123;criteria&#125;</span></span><br><span class="line"><span class="string">    ***</span></span><br><span class="line"><span class="string">    [数据结束]</span></span><br><span class="line"><span class="string">    提交的内容是否符合标准？首先，逐步写出你对标准的推理过程，以确保你的结论是正确的。避免一开始就简单地陈述正确答案。然后，在单独的一行上仅打印单个字符“Y”或“N”（不带引号或标点符号）以对应正确答案。最后，在新的一行上再次单独重复该字母。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">    <span class="string">推理:</span></span><br><span class="line">  <span class="attr">eval_type:</span> <span class="string">cot_classify</span></span><br><span class="line">  <span class="attr">choice_scores:</span></span><br><span class="line">    <span class="attr">&quot;Y&quot;:</span> <span class="number">1.0</span></span><br><span class="line">    <span class="attr">&quot;N&quot;:</span> <span class="number">0.0</span></span><br><span class="line">  <span class="attr">choice_strings:</span> <span class="string">&#x27;YN&#x27;</span></span><br><span class="line">  <span class="attr">input_outputs:</span></span><br><span class="line">    <span class="attr">input:</span> <span class="string">&quot;completion&quot;</span></span><br></pre></td></tr></table></figure>
+<p>看prompt可以很容易发现这是一个回答Yes或者No的问题，那么怎么评估相关性、简洁性和正确性呢？实际上这几个性质应该通过<code>criteria</code>字段进行描述。但我们可以发现，配置文件里并不包含关于<code>criteria</code>的具体信息。实际上，这是在准备的数据集里面定义的。我们在之前的评估数据准备章节里说到需要准备<code>input</code>字段和<code>ideal</code>字段，这里是特殊情况，我们额外需要准备<code>criteria</code>字段以告诉LLM我们要评估哪个标准。比如，我们要专门评估相关性，就可以建一个<code>criteria</code>字段描述相关性的jsonl文件：
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;input&quot;</span><span class="punctuation">:</span> <span class="string">&quot;北极熊可以生活在南极吗？&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;ideal&quot;</span><span class="punctuation">:</span> <span class="string">&quot;不能&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;criteria&quot;</span><span class="punctuation">:</span> <span class="string">&quot;以提交的答案和任务的相关性进行打分，如果强相关则符合标准，否则不符合。&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>通过很多个这样的示例，可以构造一个专门用于评估相关性的数据集。同样，也可以改变该字段用来评估简洁性、正确性等，甚至如果这几个指标同等重要也可以进行混合。最后这个prompt用到了<code>choice_scores</code>，就是如果是Y那模型就在该项上得1分，否则不得分。</p>
+<h4 id="battle">battle</h4>
+<p>一对一评估，比较两个可能不同的提示的两个模型完成情况。<code>choice_scores</code>这里用于记录判断第一个完成情况优于第二个完成情况的频率。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">battle:</span></span><br><span class="line">  <span class="attr">prompt:</span> <span class="string">|-</span></span><br><span class="line"><span class="string">    你正在比较对以下两条指令的两个回答。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">    [<span class="string">指令</span> <span class="number">1</span>]</span><br><span class="line">    &#123;<span class="string">input1</span>&#125;</span><br><span class="line">    [<span class="string">回答</span> <span class="number">1</span>]</span><br><span class="line">    &#123;<span class="string">completion1</span>&#125;</span><br><span class="line"></span><br><span class="line">    [<span class="string">指令</span> <span class="number">2</span>]</span><br><span class="line">    &#123;<span class="string">input2</span>&#125;</span><br><span class="line">    [<span class="string">回答</span> <span class="number">2</span>&#125;</span><br><span class="line">    &#123;<span class="string">completion2</span>&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="string">第一个回答是否比第二个更好？你必须基于你的主观判断提供一个答案。</span></span><br><span class="line">  <span class="attr">choice_strings:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;Yes&quot;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;No&quot;</span></span><br><span class="line">  <span class="attr">choice_scores:</span></span><br><span class="line">    <span class="attr">&quot;Yes&quot;:</span> <span class="number">1.0</span></span><br><span class="line">    <span class="attr">&quot;No&quot;:</span> <span class="number">0.0</span></span><br><span class="line">  <span class="attr">input_outputs:</span></span><br><span class="line">    <span class="attr">input1:</span> <span class="string">completion1</span></span><br><span class="line">    <span class="attr">input2:</span> <span class="string">completion2</span></span><br></pre></td></tr></table></figure>
+<p>用于比较两个模型输出的相对好坏，因为有时候没有对照很难说一个回答有多好，但如果要比较两个回答则可能相对容易。在实际操作中，我们一般会使用更具体的指令告诉模型去比较哪些方面。比如我们训练一个讲笑话模型，可能就会问第一个模型的输出是否比第二个模型输出更幽默。</p>
+<p>以上是三个基于模型的评估指标，基本涵盖了使用LLM评估答案效果的大部分情况，可以根据具体情况调整以获得更好效果。</p>
+<h3 id="运行评估">运行评估</h3>
+<p>准备好数据、配置好指标、注册好任务之后，就可以开始运行评估了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">oaieval gpt-3.5-turbo &lt;eval_name&gt;</span><br></pre></td></tr></table></figure>
+<p>这样就可以使用gpt-3.5完成整个评估流程。</p>
+<h2 id="lm-evaluation-harness">lm-evaluation-harness</h2>
+<p><code>lm-evaluation-harness</code>是EleutherAI开源的语言模型评估套件，被用做Open
+LLM
+Leaderboard的后端实现，可以说<code>lm-evaluation-harness</code>是目前最in最流行的大模型评估框架了。其原生支持了MMLU、GMS8K、GPTQ等多种流行大模型评测任务的开箱即用评测，并且也支持从VLLM评测本地模型、调用API评测远端模型。同时，它还支持使用Zeno、Weights
+and
+Biases等可视化工具对评测结果来对评测结果进行可视化展示。基本上一站式搞定了LLM评估的全流程，因此对这个框架会进行实操以加深熟悉度。</p>
+<h3 id="框架安装">框架安装</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 https://github.com/EleutherAI/lm-evaluation-harness</span><br><span class="line"><span class="built_in">cd</span> lm-evaluation-harness</span><br><span class="line">pip install -e .</span><br></pre></td></tr></table></figure>
+<p>与<code>evals</code>相似，官方推荐使用"-e"就地安装，这样代码的更改可以直接生效，方便我们注册新任务。</p>
+<p>当然，一般需要根据需要安装一些额外的依赖项，一般会使用<code>api</code>以调用openai形式LLM的api。另外，也会使用<code>wandb</code>来可视化输出。因此，可以这样安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install -e <span class="string">&quot;.[api]&quot;</span></span><br><span class="line">pip install -e <span class="string">&quot;.[wandb]&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="任务注册">任务注册</h3>
+<p>和<code>evals</code>类似，<code>lm-evaluation-harness</code>也是将新任务放置于特定目录，然后自动进行注册的。</p>
+<p><code>lm-evaluation-harness</code>的任务放置于<code>lm_eval/tasks</code>目录下，任务通过<code>yaml</code>文件进行注册，其模板如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">task:</span> <span class="string">&lt;任务名&gt;</span></span><br><span class="line"><span class="attr">dataset_path:</span> <span class="string">&lt;数据集路径，可以填写线上hf数据集的路径&gt;</span></span><br><span class="line"><span class="attr">dataset_name:</span> <span class="string">&lt;使用的子集名词，无则填`null`&gt;</span></span><br><span class="line"><span class="attr">validation_split:</span> <span class="string">&lt;使用的子集分割&gt;</span></span><br><span class="line"><span class="attr">output_type:</span> <span class="string">generate_until</span></span><br><span class="line"><span class="attr">process_docs:</span> <span class="type">!function</span> <span class="string">utils.process_docs</span></span><br><span class="line"><span class="attr">doc_to_text:</span> <span class="string">&quot;阅读并作答以下逻辑题目，注意最终答案必须新起一行并以`#### 答案: [正确选项]`，如`#### 答案: A`。下面是题目。\n<span class="template-variable">&#123;&#123;Question.strip()&#125;&#125;</span>\n&quot;</span></span><br><span class="line"><span class="attr">doc_to_target:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;Answer&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="attr">generation_kwargs:</span></span><br><span class="line">  <span class="attr">until:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;&lt;/s&gt;&quot;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;&lt;|im_end|&gt;&quot;</span></span><br><span class="line">  <span class="attr">do_sample:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">temperature:</span> <span class="number">0.0</span></span><br><span class="line">  <span class="attr">max_gen_toks:</span> <span class="number">16000</span></span><br><span class="line"><span class="attr">filter_list:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;score-first&quot;</span></span><br><span class="line">    <span class="attr">filter:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">function:</span> <span class="string">&quot;regex&quot;</span></span><br><span class="line">        <span class="attr">regex_pattern:</span> <span class="string">&quot;#### 答案: ([ABCDE])&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">function:</span> <span class="string">&quot;take_first&quot;</span></span><br><span class="line"><span class="attr">metric_list:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">metric:</span> <span class="string">exact_match</span></span><br><span class="line">    <span class="attr">aggregation:</span> <span class="string">mean</span></span><br><span class="line">    <span class="attr">higher_is_better:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">1.0</span></span><br></pre></td></tr></table></figure>
+<p><code>task</code>参数类似于任务的ID，需要唯一化。</p>
+<p>而评估的数据集方面，<code>lm-evaluation-harness</code>选择托管给huggingface的datasets库进行处理。</p>
+<p><code>output_type</code>方面则具有几种选择：</p>
+<ol type="1">
+<li><code>generate_until</code>：这是当下LLM最常用的评估手段，即给定源输入（source），以及生成参数，之后让模型生成该问题的输出（output）。</li>
+<li><code>loglikelihood</code>：这其实是之前语言模型尚没有很好的指令遵循能力时常用的一种评估方法。会直接给定源输入（source）和目标输出（target），最后返回基于此输入，语言模型产生目标输出的对数似然。对数似然可以用于衡量语言模型在给定输入条件下对于目标输出的倾向性，因此可以用于做多项选择题。</li>
+<li><code>loglikelihood_rolling</code>：计算输入字符串在语言模型上的对数似然，它是<code>loglikelihood</code>的一种source为空字符串的特殊形式，指标的意义实际上和困惑度比较接近。主要是用于评估模型在该数据分布上的预测能力。</li>
+</ol>
+<p><span class="math display">\[
+\text{PPL} = \exp\left(-\frac{1}{N} \sum_{i=1}^N \log P(w_i | w_1, w_2,
+\ldots, w_{i-1})\right)
+\]</span></p>
+<p><span class="math display">\[
+\text{loglikelihood\_rolling} = \sum_{i=1}^N \log P(w_i | w_1, w_2,
+\ldots, w_{i-1})
+\]</span></p>
+<p><span class="math display">\[
+\text{PPL} = \exp\left(-\frac{\text{loglikelihood\_rolling}}{N}\right)
+\]</span></p>
+<p>目前评估LLM大多数使用第一个参数，直接评估模型输出和用户使用场景也是最贴近的。</p>
+<p><code>generation_kwargs</code>主要用于指定LLM生成时的一些参数。</p>
+<p><code>doc_to_text</code>就是编写prompt的地方，可以利用两个花括号将<code>doc</code>数据中的字段传入prompt模板中。同理，<code>doc_to_target</code>也是类似的。</p>
+<p><code>process_docs: !function utils.process_docs</code>这一行可以用于指定处理<code>Dataset</code>的函数，该函数可以写在注册任务同级的<code>utils.py</code>中。可以通过<code>Dataset</code>的filter和map方法方便地对每一行数据进行适当的处理。比如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">process_docs</span>(<span class="params">dataset: datasets.Dataset</span>) -&gt; datasets.Dataset:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_process_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="comment"># 可以做一些简单的后处理</span></span><br><span class="line">        <span class="comment"># 但这里不需要，因此直接返回</span></span><br><span class="line">        <span class="keyword">return</span> doc</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_filter_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&quot;#need_image&quot;</span> <span class="keyword">in</span> doc[<span class="string">&quot;Question&quot;</span>]:</span><br><span class="line">            <span class="comment"># 这边对需要图像的示例进行过滤</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">	</span><br><span class="line">    dataset = dataset.<span class="built_in">filter</span>(_filter_doc)</span><br><span class="line">    dataset = dataset.<span class="built_in">map</span>(_process_doc)</span><br><span class="line">    <span class="keyword">return</span> dataset</span><br></pre></td></tr></table></figure>
+<p><code>filter_list</code>则是指定从模型输出中寻找答案的方式，一般使用正则表达式。比如示例中就通过“####
+答案: ([ABCDE])”的正则表达式，取第一个匹配的项目作为答案。</p>
+<p><code>metric_list</code>指定评估的指标，这部分也可以参考<code>evals</code>的评估指标进行设置。这里因为只是选择题，可以直接使用<code>exact_match</code>精确匹配来进行衡量。如果有用LLM做评估的，似乎也在进行中，参考：<a
+target="_blank" rel="noopener" href="https://github.com/EleutherAI/lm-evaluation-harness/issues/2233">TODOs
+for Implementing LLM-as-a-Judge in Eval-Harness (Work in Progress)
+#2233</a>。</p>
+<p>最后，<code>metadata</code>里可以用来记录评估任务的版本信息。</p>
+<h3 id="运行评估-1">运行评估</h3>
+<h4 id="命令行评估">命令行评估</h4>
+<p><code>lm-evaluation-harness</code>的直接使用途径是通过命令行，即：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">lm_eval --model &lt;模型类型&gt; \</span><br><span class="line">    --model_args model=&lt;模型参数&gt; \</span><br><span class="line">    --tasks &lt;任务名&gt; \</span><br><span class="line">    --apply_chat_template \</span><br><span class="line">    --log_samples \</span><br><span class="line">    --output_path &lt;输出路径&gt; \</span><br><span class="line">    --wandb_args project=&lt;项目名&gt;,name=&lt;实验名&gt; \</span><br></pre></td></tr></table></figure>
+<p>如果仅使用预设任务评估预设模型（如openai的模型或huggingface上托管的模型），这样是相对简单直观的。如果需要更加个性化的设置，可以进一步参考<a
+target="_blank" rel="noopener" href="https://github.com/EleutherAI/lm-evaluation-harness/blob/main/docs/interface.md">参数说明</a>。</p>
+<h4 id="脚本评估">脚本评估</h4>
+<p>有时候我们自己编写的评估任务可能希望其他用户使用命令行如调用预设任务一般执行评估，但在开发过程中可能有一些边界条件需要调试。这时候如果直接通过命令行调试可能就得用pdb调试器调试了。</p>
+<p>但有时候我们使用了现代化的IDE（如VSCode），我们希望直接在现代化IDE的可视化界面而不是在相对简陋的命令行上执行调试。这时候我们需要将命令行调用转为脚本调用。源代码的<code>lm_eval/__main__.py</code>中处理命令行评估的相关问题：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># lm_eval/__main__.py</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cli_evaluate</span>(<span class="params">args: <span class="type">Union</span>[argparse.Namespace, <span class="literal">None</span>] = <span class="literal">None</span></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">    <span class="comment"># 省略掉源代码</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>那我们可以使用一个脚本模拟其调用，如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> lm_eval.__main__ <span class="keyword">import</span> cli_evaluate, setup_parser</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="comment"># 创建参数解析器</span></span><br><span class="line">    parser = setup_parser()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 模拟命令行参数</span></span><br><span class="line">    command_line_args = [</span><br><span class="line">        <span class="string">&quot;--model&quot;</span>, <span class="string">&quot;&lt;模型类型&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;--model_args&quot;</span>, <span class="string">&quot;&lt;模型参数&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;--tasks&quot;</span>, <span class="string">&quot;&lt;任务名&gt;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;--apply_chat_template&quot;</span>,</span><br><span class="line">        <span class="string">&quot;--log_samples&quot;</span>,</span><br><span class="line">        <span class="string">&quot;--output_path&quot;</span>, <span class="string">&quot;&lt;输出路径&gt;&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    args = parser.parse_args(command_line_args)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 调用评估函数</span></span><br><span class="line">    cli_evaluate(args)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这样我们可以使用VSCode调试器如调试其他python程序一般调试新任务或者新模型代码。</p>
+<p>有时候一些由yaml配置文件转过来的调用，如：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">process_docs:</span> <span class="type">!function</span> <span class="string">utils.process_docs</span></span><br></pre></td></tr></table></figure>
+<p>这里面<code>utils.py</code>中的<code>process_docs</code>函数可能会遇到打断点打不上的问题。原因可能是yaml文件中的
+<code>!function</code>
+是通过反序列化机制动态解析的。这种方式通常通过反射或 <code>import</code>
+动态加载函数，而不是直接导入python模块。这可能使调试器无法正确关联源代码位置。</p>
+<p>这时候可以使用python
+3.7（笔者写这个的时候python版本基本都比3.7高了，因此可以直接当作标准库内置函数用了）引入的<code>breakpoint</code>函数来手动打断点。有些资料说这个<code>breakpoint</code>函数相当于<code>pdb.set_trace()</code>，这个理解在默认情况下是对的，直接调用该函数确实会进入pdb调试。但在VSCode调试环境下，<code>breakpoint</code>函数会调用VSCode关联调试器的断点函数，具体可以参考python文档：</p>
+<blockquote>
+<p><code>breakpoint</code>函数会在调用位置进入调试器。
+具体来说，它将调用 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/sys.html#sys.breakpointhook"><code>sys.breakpointhook()</code></a>，直接传递
+<code>args</code> 和 <code>kws</code>。
+在默认情况下，<code>sys.breakpointhook()</code> 将不带参数地调用 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/pdb.html#pdb.set_trace"><code>pdb.set_trace()</code></a>。
+在此情况下，它纯粹是一个便捷函数让你不必显式地导入 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/pdb.html#module-pdb"><code>pdb</code></a>
+或键入过多代码即可进入调试器。 不过，<a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/sys.html#sys.breakpointhook"><code>sys.breakpointhook()</code></a>
+也可被设置为某些其他函数并被 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#breakpoint"><code>breakpoint()</code></a>
+自动调用，允许你进入选定的调试器。 如果 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/sys.html#sys.breakpointhook"><code>sys.breakpointhook()</code></a>
+不可用，此函数将引发 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/exceptions.html#RuntimeError"><code>RuntimeError</code></a>。</p>
+<p>在默认情况下，<a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#breakpoint"><code>breakpoint()</code></a>
+的行为可使用 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/using/cmdline.html#envvar-PYTHONBREAKPOINT"><code>PYTHONBREAKPOINT</code></a>
+环境变量来改变。 请参阅 <a
+target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/sys.html#sys.breakpointhook"><code>sys.breakpointhook()</code></a>
+了解详细用法。</p>
+</blockquote>
+<p>因此，可以在需要调试的代码上方加入<code>breakpoint()</code>函数来手动打断点，防止yaml反序列的函数无法正确关联源代码位置，并且可以正常使用VSCode调试器。</p>
+<h4 id="外部库使用">外部库使用</h4>
+<p><code>lm-evaluation-harness</code>甚至还支持集成到外部库中，这样可以在训练时及时对模型能力进行评估。集成代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lm_eval</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">my_model = initialize_my_model() <span class="comment"># create your model (could be running finetuning with some custom modeling code)</span></span><br><span class="line">...</span><br><span class="line"><span class="comment"># instantiate an LM subclass that takes your initialized model and can run</span></span><br><span class="line"><span class="comment"># - `Your_LM.loglikelihood()`</span></span><br><span class="line"><span class="comment"># - `Your_LM.loglikelihood_rolling()`</span></span><br><span class="line"><span class="comment"># - `Your_LM.generate_until()`</span></span><br><span class="line">lm_obj = Your_LM(model=my_model, batch_size=<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># indexes all tasks from the `lm_eval/tasks` subdirectory.</span></span><br><span class="line"><span class="comment"># Alternatively, you can set `TaskManager(include_path=&quot;path/to/my/custom/task/configs&quot;)`</span></span><br><span class="line"><span class="comment"># to include a set of tasks in a separate directory.</span></span><br><span class="line">task_manager = lm_eval.tasks.TaskManager()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Setting `task_manager` to the one above is optional and should generally be done</span></span><br><span class="line"><span class="comment"># if you want to include tasks from paths other than ones in `lm_eval/tasks`.</span></span><br><span class="line"><span class="comment"># `simple_evaluate` will instantiate its own task_manager if it is set to None here.</span></span><br><span class="line">results = lm_eval.simple_evaluate( <span class="comment"># call simple_evaluate</span></span><br><span class="line">    model=lm_obj,</span><br><span class="line">    tasks=[<span class="string">&quot;taskname1&quot;</span>, <span class="string">&quot;taskname2&quot;</span>],</span><br><span class="line">    num_fewshot=<span class="number">0</span>,</span><br><span class="line">    task_manager=task_manager,</span><br><span class="line">    ...</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这里的<code>Your_LM</code>需要进一步实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyCustomLM</span>(<span class="title class_ inherited__">LM</span>):</span><br><span class="line">    <span class="comment">#...</span></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">tokenizer_name</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Return the name of the model&#x27;s tokenizer and/or the accompanying chat template.</span></span><br><span class="line"><span class="string">        The returned string is used to cache requests.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            str: The name of the model&#x27;s tokenizer and/or chat template.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">chat_template</span>(<span class="params">self, chat_template: <span class="type">Union</span>[<span class="built_in">bool</span>, <span class="built_in">str</span>] = <span class="literal">False</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Get the appropriate chat template for the model based on the `chat_template` argument.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        This method returns the chat template string to build the prompt from a chat history.</span></span><br><span class="line"><span class="string">        The chat template is saved in the evaluation results for reproducibility.</span></span><br><span class="line"><span class="string">        Boolean arguments should be used with models that have only one chat template,</span></span><br><span class="line"><span class="string">        while string arguments are used with models that have multiple chat templates.</span></span><br><span class="line"><span class="string">        For the reference implementation, see HFLM class in `lm_eval.models.huggingface`.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            chat_template (Union[bool, str]): Specifies whether to apply a chat template:</span></span><br><span class="line"><span class="string">                - If False: Do not apply any chat template.</span></span><br><span class="line"><span class="string">                - If True: Apply the default chat template.</span></span><br><span class="line"><span class="string">                - If str: Apply the specified chat template by name.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            str: The selected chat template in Jinja format.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">apply_chat_template</span>(<span class="params">self, chat_history: <span class="type">List</span>[<span class="type">Dict</span>[<span class="built_in">str</span>, <span class="built_in">str</span>]]</span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Process a chat history to create a string that can be tokenized and input into the model.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            chat_history (List[Dict[str, str]]): A list of dictionaries representing the chat history,</span></span><br><span class="line"><span class="string">                where each dictionary has &quot;role&quot; and &quot;content&quot; keys.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            str: A string representing the chat history that can be tokenized and fed into the model.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这样灵活性很强，可以说既有<code>Evaluate</code>库应用范围广的优点，也有<code>evals</code>为评估语言模型设计、灵活易用的优点。</p>
+<h2 id="argilla">Argilla</h2>
+<p>Argilla
+是人工智能工程师和领域专家构建高质量数据集的协作工具。Argilla实际并不严格是一个LLM评估工具，它更多的是一个数据集管理工具。但在LLM可以作为Teacher模型，甚至可以作为Judge的当下，管理LLM的输出，提升LLM输出质量以构建高质量数据集也成为模型性能迭代的重要议题。构建高效的数据飞轮以提升数据集规模和质量、缩短数据提质周期对LLM业务落地至关重要。</p>
+<p>Argilla
+的编程方法让您可以构建工作流程以进行持续评估和模型改进。Argilla
+的目标是<strong>通过快速迭代正确的数据和模型来确保您的数据工作获得回报</strong>。计算成本高昂，输出质量也很重要。我们帮助您专注于数据，从而同时解决这两个问题的根本原因。Argilla
+可帮助您<strong>实现并保持数据的高质量标准</strong>。这意味着您可以提高
+AI 输出的质量。</p>
+<p>这个工具之后可能也需要学习一下，这里给个文档地址标记一下：<a
+target="_blank" rel="noopener" href="https://docs.argilla.io/latest">Argilla文档</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2025/01/04/LLM%E8%AF%84%E4%BC%B0/">https://lisheng2001.github.io/2025/01/04/LLM评估/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B/">大语言模型</a><a class="post-meta__tags" href="/tags/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/">模型评估</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">huggingface中Datasets模块的笔记</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/04/word%E7%BC%BA%E5%A4%B1%E5%AD%97%E4%BD%93%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="word缺失字体的解决方案"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">word缺失字体的解决方案</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-28</div><div class="title">从3篇论文回顾2024年基础大语言模型的进展</div></div></a></div><div><a href="/2024/06/27/%E7%BB%86%E8%8A%82%E5%A4%84%E8%A7%81%E7%9C%9F%E7%AB%A0%E2%80%94%E2%80%94LLM%E4%B8%AD%E7%9A%84tokenizer/" title="细节处见真章——LLM中的tokenizer"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-27</div><div class="title">细节处见真章——LLM中的tokenizer</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#evaluate"><span class="toc-number">1.</span> <span class="toc-text">Evaluate</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ragas"><span class="toc-number">2.</span> <span class="toc-text">RAGAs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%A0%E5%AE%9E%E6%80%A7"><span class="toc-number">2.1.</span> <span class="toc-text">忠实性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%94%E6%A1%88%E7%9B%B8%E5%85%B3%E6%80%A7"><span class="toc-number">2.2.</span> <span class="toc-text">答案相关性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E5%85%B3%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">上下文相关性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E6%95%88%E6%9E%9C"><span class="toc-number">2.4.</span> <span class="toc-text">方法效果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%88%91%E7%9A%84%E5%90%AF%E5%8F%91"><span class="toc-number">2.5.</span> <span class="toc-text">对我的启发</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#evals"><span class="toc-number">3.</span> <span class="toc-text">evals</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87"><span class="toc-number">3.1.</span> <span class="toc-text">评估数据准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87"><span class="toc-number">3.2.</span> <span class="toc-text">评估指标</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#fact"><span class="toc-number">3.2.1.</span> <span class="toc-text">fact</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#closeqa"><span class="toc-number">3.2.2.</span> <span class="toc-text">closeqa</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#battle"><span class="toc-number">3.2.3.</span> <span class="toc-text">battle</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E8%AF%84%E4%BC%B0"><span class="toc-number">3.3.</span> <span class="toc-text">运行评估</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lm-evaluation-harness"><span class="toc-number">4.</span> <span class="toc-text">lm-evaluation-harness</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%86%E6%9E%B6%E5%AE%89%E8%A3%85"><span class="toc-number">4.1.</span> <span class="toc-text">框架安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E6%B3%A8%E5%86%8C"><span class="toc-number">4.2.</span> <span class="toc-text">任务注册</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E8%AF%84%E4%BC%B0-1"><span class="toc-number">4.3.</span> <span class="toc-text">运行评估</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%AF%84%E4%BC%B0"><span class="toc-number">4.3.1.</span> <span class="toc-text">命令行评估</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E8%AF%84%E4%BC%B0"><span class="toc-number">4.3.2.</span> <span class="toc-text">脚本评估</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E5%BA%93%E4%BD%BF%E7%94%A8"><span class="toc-number">4.3.3.</span> <span class="toc-text">外部库使用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#argilla"><span class="toc-number">5.</span> <span class="toc-text">Argilla</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

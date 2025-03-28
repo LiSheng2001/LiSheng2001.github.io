@@ -1,0 +1,395 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>浅谈分类任务的指标 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="在做分类任务时一般会想到使用正确率Accuracy指标，这是相当符合直觉的一个指标。就类似于我们人类做选择题一样，不管是ABCD四选一还是ABC三选一，总之数一下题目的数量，再数一下答对的题目的数量，最后后者比前者算出正确率，然后按正确率越高越好的原则做出判断即可。但在做分类任务时，由于数据集呈现出来不同的特点，因此单纯考察正确率就显得不太公平。比如一张卷子提前知道了70%的题是将A选项作为正确答">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈分类任务的指标">
+<meta property="og:url" content="https://lisheng2001.github.io/2023/04/15/%E6%B5%85%E8%B0%88%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%8C%87%E6%A0%87/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="在做分类任务时一般会想到使用正确率Accuracy指标，这是相当符合直觉的一个指标。就类似于我们人类做选择题一样，不管是ABCD四选一还是ABC三选一，总之数一下题目的数量，再数一下答对的题目的数量，最后后者比前者算出正确率，然后按正确率越高越好的原则做出判断即可。但在做分类任务时，由于数据集呈现出来不同的特点，因此单纯考察正确率就显得不太公平。比如一张卷子提前知道了70%的题是将A选项作为正确答">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2023-04-15T11:19:24.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.463Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="分类指标">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2023/04/15/%E6%B5%85%E8%B0%88%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%8C%87%E6%A0%87/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '浅谈分类任务的指标',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">浅谈分类任务的指标</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-15T11:19:24.000Z" title="发表于 2023-04-15 19:19:24">2023-04-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.463Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="浅谈分类任务的指标"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>在做分类任务时一般会想到使用正确率<code>Accuracy</code>指标，这是相当符合直觉的一个指标。就类似于我们人类做选择题一样，不管是ABCD四选一还是ABC三选一，总之数一下题目的数量，再数一下答对的题目的数量，最后后者比前者算出正确率，然后按正确率越高越好的原则做出判断即可。但在做分类任务时，由于数据集呈现出来不同的特点，因此单纯考察正确率就显得不太公平。比如一张卷子提前知道了70%的题是将A选项作为正确答案的，那即使什么都不会的人参考，只要全选A也能得70分，这样正确率的评估效果就大打折扣了。</p>
+<p>为了寻找在不同数据集下能相对公平评判模型效果，像精确率<code>Precision</code>、召回率<code>Recall</code>、<code>F1</code>分数、<code>AUC</code>ROC曲线下面积这的指标也常常被用于分类任务。本文中将做一下简单的梳理。</p>
+<h1 id="基础分类指标">基础分类指标</h1>
+<p>分类任务可以分为二分类和多分类，对于多分类任务，对每个类别也可以看作为”是该类“与”不是该类“的二分类任务。因此在下面讨论基础分类指标时，均以二分类作为基准来讨论。记号如下：</p>
+<ul>
+<li>True Positive (TP): 把正样本成功预测为正。</li>
+<li><strong>True Negative (TN)：把负样本成功预测为负。</strong></li>
+<li>False Positive (FP)：把负样本错误地预测为正。</li>
+<li><strong>False Negative (FN)：把正样本错误的预测为负。</strong></li>
+</ul>
+<h2 id="精确率-precision">精确率 Precision</h2>
+<p>计算公式是： <span class="math display">\[
+Precision = \frac{TP}{TP+FP}
+\]</span>
+表达的含义就是我觉得真的的事情里面有多大的比例是实际上是真的。</p>
+<h2 id="召回率-recall">召回率 Recall</h2>
+<p>计算公式是： <span class="math display">\[
+Recall = \frac{TP}{TP+FN}
+\]</span>
+表达的含义是所有真实的事情中，有多大的比例是我认为是真实的。</p>
+<p>在模型能力不变的前提下，精确率<code>Precision</code>和召回率<code>Recall</code>实际是矛盾的。因为如果我想要提高精确率，那么我就会变得谨慎，判断事情真假时如果我没有很高的把握，我就不会认为它是真的。这种策略下，精确率确实可以提高。但是反过来，召回率就会下降，因为太过保守会错失一些原本可以预测对的事情。</p>
+<p>精确率和召回率存在Trade-off，<strong>对现实任务来说，精确率和召回率可能不是同等重要的，那就存在根据业务做取舍的需求</strong>。比如门禁系统的人脸识别任务，如果召回率不高，那么后果可能就是需要更多帧去识别这个人究竟是不是业主，给人的体验就是系统比较慢而已；但如果是准确率不高，后果就可能是把无关的人识别成业主了，给人的体验就是整个系统不可靠！因此在这种场景下，准确率是比召回率重要得多的。但反过来说，如果同样是人脸识别任务，但是目标是去寻找失联人员，那宁可吃点亏多排查几个地点，也不能放过可能相似的线索，这时候召回率又会比准确率重要得多。</p>
+<h2 id="f1分数">F1分数</h2>
+<p>计算公式： <span class="math display">\[
+F1\ Score = 2 * \frac{Precision*Recall}{Precision+Recall}
+\]</span>
+F1分数实际是准确率和召回率的调和平均值，可以用于更平衡地总结模型性能。</p>
+<p>如果我们将<code>Precision</code>,
+<code>Recall</code>按公式展开，可以得到： <span class="math display">\[
+F1\ Score=\frac{TP}{TP+\frac{1}{2}(FP+FN)}
+\]</span></p>
+<h2 id="正确率-accuracy">正确率 Accuracy</h2>
+<p>计算公式： <span class="math display">\[
+Accuracy = \frac{TP+TN}{TP+FP+FN+TN}
+\]</span> 这个好理解，就是分类问题做对的比例。</p>
+<h2 id="auc-roc曲线下面积">AUC ROC曲线下面积</h2>
+<p>这是比较复杂的概念之一，它不像上面3个指标那么直观。我们首先来看一下什么是ROC曲线。</p>
+<h3 id="roc曲线">ROC曲线</h3>
+<p><code>ROC曲线</code>(Receiver Operating
+Characteristics，受试者工作特征曲线)。ROC曲线的横轴是伪阳性率（False
+Positive Rate, FPR），纵轴是是真阳性率（True Positive Rate, TPR）。</p>
+<ul>
+<li>伪阳性率（FPR）：判定为正例却不是真正例的概率，即真负例中判为正例的概率</li>
+<li>真阳性率（TPR）：判定为正例也是真正例的概率，即真正例中判为正例的概率（也即正例召回率）</li>
+</ul>
+<p>可以发现，前面说到的召回率实际对应这里的真阳性率，准确率实际是1-伪阳性率（伪阳性是判定为真的实际却不是真的概率）。在不同场景下，准确率可以和召回率做取舍，那通过调整阈值，可以获得模型对应的一系列FPR和TPR的值。将这一系列值绘制到图上，就形成了ROC曲线。</p>
+<h3 id="auc-曲线下面积">AUC 曲线下面积</h3>
+<p>ROC曲线的面积就是<code>AUC</code>。如果FPR比较小时，实际意味着准确率比较高，那相应的对应召回率会比较低，即TPR会比较小。随着FPR的增大，TPR会逐渐上升，直到模型预测任何事情都为真，此时TPR为1。那一个直观的想法就是，如果在保证准确率比较高的情况下，召回率仍然不差的模型，这样的模型能力会比较强。将这个想法进行数学表达，就是ROC曲线下的面积AUC，AUC越大，就意味着模型在高准确率/召回率下能保持相对高的召回率/准确率，那这样的模型分类能力是相对更强的。</p>
+<h3 id="auc判断分类器分类效果的标准">AUC判断分类器分类效果的标准</h3>
+<p>其实和分类任务的难度有关。但一般来说，AUC在0.5附近说明模型预测效果可能比随即猜测好不到哪去。如果AUC比0.5高，那就有可以应用的价值（实在很差也有当弱分类器集成的价值）；如果AUC比0.5还低不少，那么很可能是训练的时候把标签搞反了。AUC越接近1，那分类效果就越好。</p>
+<h3 id="auc和accuracy的比较">AUC和Accuracy的比较</h3>
+<p>当样本类别分布均衡时，<code>Accuracy</code>是更好的选择，因为它简单直观，看到正确率的值就可以很清晰地知道分类器对该问题的分类水平。</p>
+<p>但当样本不平衡时，正确率被多数类所主导，<code>Accuracy</code>没办法很好地反映分类器在少数类样本上的表现。这时候<code>ROC_AUC</code>就能体现出不被类别不平衡问题影响的优势了。当类别不平衡且关注少数类预测效果时，<code>AUC</code>是更好的指标。</p>
+<h1 id="平均f1值计算">平均F1值计算</h1>
+<p>对于多分类问题，每个类别都能转化为1对其他类而转化为二分类问题，从而计算出一个F1值。然而最后可能只会报告数据集上的F1值，这其中就涉及到平均F1值的计算问题。从宏观来说，平均F1值可以分为Macro
+F1, Weighted F1和Micro F1(不常用)。</p>
+<h3 id="macro-f1">Macro F1</h3>
+<p>Macro
+F1遵循“众类平等”的原则，其计算也非常简单，就是直接对每个类的F1值求和之后计算平均值。计算公式如下。
+<!-- 避免转义问题 --> <span class="math display">\[
+Macro\ F1 = \frac{\sum_{i=1}^{n}{ {F1\ Score}_{C_i} } }{n}
+\]</span>
+这种平均方式相当照顾小类别的指标，只要小类别的F1值过低很可能带动整个Macro
+F1值偏低。但值得注意的是，在深度学习中度量损失的单位是样本，一个有标签的样本输入进模型才能计算出一个损失值。那理所当然对于样本比较多的类，模型会因为要降低损失而对多数类进行优待，这样可以尽可能地降低损失，达到比较好的分类性能。但如果评估一个模型的标准是Macro
+F1时，这种为了降低损失而偏好多数类的特点可能会使模型分数不佳。因此，在数据集类别分布不平衡而且评估标准是Macro
+F1时，可以考虑对少数类进行加权，来增加模型对少数类样本的重视程度，从而让Macro
+F1更能反映模型的真实性能。</p>
+<h3 id="weighted-f1">Weighted F1</h3>
+<p>Weighted
+F1是考虑了各类别样本数的F1值，按照评估集上各类别样本出现次数的比例为每个样本分配权重，计算公式如下。
+<span class="math display">\[
+Weighted\ F1= \sum_{i=1}^{n}{ {Proportion}_{C_i} * {F1\ Score}_{C_i} }
+\]</span> Weighted
+F1在算平均时考虑了各类别的样本数，因此算是一种比较公平的平均方式。一般没有特殊说明的情况下，报告的平均F1分数一般是指Weighted
+F1。</p>
+<h3 id="micro-f1">Micro F1</h3>
+<p>Micro
+F1是实际中很少出现的分数，比如<code>sklearn.metrics.classification_report</code>的功能只会报告<code>accuracy</code>,
+<code>macro avg</code>和<code>weighted avg</code>，并不会报告所谓的Micro
+F1。因为Micro F1实际上是把所有分类的TP, FN,
+FP加起来，然后用所有类的和来求F1值进而得到的： <span
+class="math display">\[
+Micro\ F1 = \frac{\sum_{i=1}^n{TP_{C_i} } }{\sum_{i=1}^n{TP_{C_i} +
+\frac{1}{2}(FP_{Ci}+FN_{Ci})} }
+\]</span> 这个计算的结果实际上等于正确率<code>accuracy</code>，Micro
+F1作为评价指标时，实际上与更容易理解的正确率是等效的。因此常常会直接使用正确率，而不是Micro
+F1。</p>
+<h1 id="参考资料">参考资料</h1>
+<ol type="1">
+<li><a
+target="_blank" rel="noopener" href="https://towardsdatascience.com/micro-macro-weighted-averages-of-f1-score-clearly-explained-b603420b292f">Micro,
+Macro &amp; Weighted Averages of F1 Score, Clearly Explained</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://easyai.tech/ai-definition/accuracy-precision-recall-f1-roc-auc/">分类模型评估指标——准确率、精准率、召回率、F1、ROC曲线、AUC曲线</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://towardsdatascience.com/understanding-auc-roc-curve-68b2303cc9c5">Understanding
+AUC - ROC Curve</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2023/04/15/%E6%B5%85%E8%B0%88%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%8C%87%E6%A0%87/">https://lisheng2001.github.io/2023/04/15/浅谈分类任务的指标/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E7%B1%BB%E6%8C%87%E6%A0%87/">分类指标</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/21/%E6%B5%85%E8%B0%88Linux%E4%B8%8B%E7%9A%84%E8%84%9A%E6%9C%AC%E8%BF%90%E8%A1%8C%E4%B8%8E%E5%8E%8B%E7%BC%A9%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B/" title="浅谈Linux下的脚本运行与压缩文件解压"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">浅谈Linux下的脚本运行与压缩文件解压</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/14/%E6%B5%85%E8%B0%88read-image%E5%87%BA%E9%94%99%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/" title="浅谈read_image出错的解决办法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">浅谈read_image出错的解决办法</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%88%86%E7%B1%BB%E6%8C%87%E6%A0%87"><span class="toc-number">1.</span> <span class="toc-text">基础分类指标</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B2%BE%E7%A1%AE%E7%8E%87-precision"><span class="toc-number">1.1.</span> <span class="toc-text">精确率 Precision</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AC%E5%9B%9E%E7%8E%87-recall"><span class="toc-number">1.2.</span> <span class="toc-text">召回率 Recall</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#f1%E5%88%86%E6%95%B0"><span class="toc-number">1.3.</span> <span class="toc-text">F1分数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A3%E7%A1%AE%E7%8E%87-accuracy"><span class="toc-number">1.4.</span> <span class="toc-text">正确率 Accuracy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#auc-roc%E6%9B%B2%E7%BA%BF%E4%B8%8B%E9%9D%A2%E7%A7%AF"><span class="toc-number">1.5.</span> <span class="toc-text">AUC ROC曲线下面积</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#roc%E6%9B%B2%E7%BA%BF"><span class="toc-number">1.5.1.</span> <span class="toc-text">ROC曲线</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auc-%E6%9B%B2%E7%BA%BF%E4%B8%8B%E9%9D%A2%E7%A7%AF"><span class="toc-number">1.5.2.</span> <span class="toc-text">AUC 曲线下面积</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auc%E5%88%A4%E6%96%AD%E5%88%86%E7%B1%BB%E5%99%A8%E5%88%86%E7%B1%BB%E6%95%88%E6%9E%9C%E7%9A%84%E6%A0%87%E5%87%86"><span class="toc-number">1.5.3.</span> <span class="toc-text">AUC判断分类器分类效果的标准</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auc%E5%92%8Caccuracy%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-number">1.5.4.</span> <span class="toc-text">AUC和Accuracy的比较</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B9%B3%E5%9D%87f1%E5%80%BC%E8%AE%A1%E7%AE%97"><span class="toc-number">2.</span> <span class="toc-text">平均F1值计算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#macro-f1"><span class="toc-number">2.0.1.</span> <span class="toc-text">Macro F1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#weighted-f1"><span class="toc-number">2.0.2.</span> <span class="toc-text">Weighted F1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#micro-f1"><span class="toc-number">2.0.3.</span> <span class="toc-text">Micro F1</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

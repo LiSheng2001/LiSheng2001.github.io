@@ -1,0 +1,388 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>LoRA类的大模型微调方法 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="LoRA（Low-Rank Adaptation of Large Language Models）是一种参数高效微调（PEFT）方法，旨在解决微调大型语言模型时面临的挑战。LoRA通过在每个模型块内部加入可训练的层，从而显著减少需要微调的参数数量，并降低GPU内存需求。目前以经有研究者开发了几种LoRA变体来补足它的短板或者提高效率。此处主要盘点一下LoRA, QLoRA, VeRA和DoRA。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LoRA类的大模型微调方法">
+<meta property="og:url" content="https://lisheng2001.github.io/2024/06/15/LoRA%E7%B1%BB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="LoRA（Low-Rank Adaptation of Large Language Models）是一种参数高效微调（PEFT）方法，旨在解决微调大型语言模型时面临的挑战。LoRA通过在每个模型块内部加入可训练的层，从而显著减少需要微调的参数数量，并降低GPU内存需求。目前以经有研究者开发了几种LoRA变体来补足它的短板或者提高效率。此处主要盘点一下LoRA, QLoRA, VeRA和DoRA。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2024-06-15T11:59:54.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.427Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="参数高效微调">
+<meta property="article:tag" content="LoRA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2024/06/15/LoRA%E7%B1%BB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E6%96%B9%E6%B3%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'LoRA类的大模型微调方法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">LoRA类的大模型微调方法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-15T11:59:54.000Z" title="发表于 2024-06-15 19:59:54">2024-06-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.427Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="LoRA类的大模型微调方法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>LoRA（Low-Rank Adaptation of Large Language
+Models）是一种参数高效微调（PEFT）方法，旨在解决微调大型语言模型时面临的挑战。LoRA通过在每个模型块内部加入可训练的层，从而显著减少需要微调的参数数量，并降低GPU内存需求。目前以经有研究者开发了几种LoRA变体来补足它的短板或者提高效率。此处主要盘点一下<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2106.09685">LoRA</a>, <a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2305.14314">QLoRA</a>, <a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2310.11454">VeRA</a>和<a
+target="_blank" rel="noopener" href="https://arxiv.org/abs/2402.09353">DoRA</a>。</p>
+<p>LoRA、QLoRA、VeRA和DoRA都是针对大型语言模型的微调（finetuning）方法，旨在提高模型在特定任务上的性能，同时减少计算和存储资源的需求。下面是对这四种方法的详细介绍以及它们之间的对比：</p>
+<h3 id="lora-low-rank-adaptation">LoRA (Low-Rank Adaptation)</h3>
+<p><img src="/images/lora_arxiv.png" alt="LoRA示意图" /> -
+<strong>介绍</strong>: LoRA
+通过在Transformer架构的每一层注入可训练的低秩分解矩阵来适应下游任务，同时冻结预训练模型权重，显著减少了可训练参数的数量。
+- <strong>优势</strong>: 与全参数微调相比，LoRA
+减少了GPU内存需求，提高了训练吞吐量，并且在推理时不引入额外的延迟。 -
+<strong>应用</strong>: LoRA
+在多个模型（如RoBERTa、DeBERTa、GPT-2和GPT-3）上表现出与或优于全参数微调的性能。</p>
+<h3 id="qlora-quantized-low-rank-adaptation">QLoRA (Quantized Low-Rank
+Adaptation)</h3>
+<p><img src="/images/qlora_arxiv.png" alt="QLoRA示意图" /> -
+<strong>介绍</strong>: QLoRA 是 LoRA
+的扩展，它通过4位量化技术降低了模型的内存使用，使得在单个GPU上微调大型模型成为可能，同时保持了16位微调的性能。
+- <strong>创新点</strong>:
+引入了4位NormalFloat（NF4）数据类型，双量化技术以及分页优化器来管理内存峰值。
+- <strong>分页优化器</strong>: 使用 NVIDIA 统一内存功能，该功能在 CPU 和
+GPU 之间自动进行页面到页面的传输，以确保 GPU
+在偶尔出现内存不足的情况下也能进行无错误的处理。该功能类似于 CPU
+内存和磁盘之间的常规内存分页。我们使用此功能为优化器状态分配分页内存，当
+GPU 内存不足时，这些内存会自动移至 CPU
+内存，在优化器更新步骤需要内存时，又会自动从 CPU RAM 内存回到 GPU
+内存。类似于虚拟内存的作用，可以在显存不足的情况下也能通过内存当显存顶上，从而保证微调程序运行，避免因为微调时的峰值内存导致程序崩溃。
+- <strong>性能</strong>: QLoRA
+训练的模型在Vicuna基准测试上超越了所有之前公开发布的模型。</p>
+<h3 id="vera-vector-based-random-matrix-adaptation">VeRA (Vector-based
+Random Matrix Adaptation)</h3>
+<figure>
+<img src="/images/vera_arxiv.png" alt="VeRA示意图" />
+<figcaption aria-hidden="true">VeRA示意图</figcaption>
+</figure>
+<p>LoRA（左）和 VeRA（右）的示意图比较。LoRA 通过训练低秩矩阵<span
+class="math inline">\(A\)</span>和<span
+class="math inline">\(B\)</span>，中间秩<span
+class="math inline">\(\gamma\)</span>来更新权重矩阵<span
+class="math inline">\(W\)</span>。在 VeRA
+中，这些矩阵被冻结，跨所有层共享，并使用可训练向量<span
+class="math inline">\(d\)</span>和<span
+class="math inline">\(b\)</span>进行适配，显著减少了可训练参数的数量。在这两种情况下，低秩矩阵和向量可以合并到原始权重矩阵<span
+class="math inline">\(W\)</span>中，不会引入额外的延迟。</p>
+<ul>
+<li><strong>介绍</strong>: VeRA
+进一步减少了可训练参数的数量，相比LoRA，它使用共享的低秩矩阵和学习小的缩放向量。</li>
+<li><strong>优势</strong>: VeRA
+在保持性能的同时，显著减少了模型的存储需求，适用于需要频繁切换多个微调模型的场景。</li>
+<li><strong>应用</strong>: VeRA
+在GLUE和E2E基准测试、图像分类任务以及指令调整的7B和13B语言模型上展示了其有效性。</li>
+</ul>
+<h3 id="dora-weight-decomposed-low-rank-adaptation">DoRA
+(Weight-Decomposed Low-Rank Adaptation)</h3>
+<p><img src="/images/dora_arxiv.png" alt="DoRA" /> DoRA
+最初将预训练权重分解为其幅度和方向分量，并微调这两个分量。由于方向分量在参数数量上较大，我们进一步使用
+LoRA 对其进行分解以实现高效的微调。</p>
+<ul>
+<li><strong>介绍</strong>: DoRA
+是一种新颖的权重分解分析方法，通过将预训练权重分解为大小和方向两个部分进行微调，特别是利用LoRA高效地更新方向部分。</li>
+<li><strong>优势</strong>: DoRA
+提高了LoRA的学习能力和训练稳定性，同时避免了额外的推理开销。</li>
+<li><strong>性能</strong>: DoRA
+在多种下游任务上一致性地超越了LoRA，如常识推理、视觉指令调整和图像/视频-文本理解。</li>
+</ul>
+<h3 id="相同点与不同点">相同点与不同点</h3>
+<ul>
+<li><strong>相同点</strong>:
+<ul>
+<li>所有方法都旨在提高大型语言模型在特定任务上的性能。</li>
+<li>都采用了低秩分解来减少模型参数的更新，以降低资源消耗。</li>
+<li>都保持了模型在推理时的效率，不引入额外的延迟。</li>
+</ul></li>
+<li><strong>不同点</strong>:
+<ul>
+<li><strong>LoRA</strong>
+是最初的方法，通过在每层注入低秩矩阵来实现微调参数减少，降低显存占用。</li>
+<li><strong>QLoRA</strong> 在 LoRA
+的基础上引入了量化技术，进一步降低了显存需求。</li>
+<li><strong>VeRA</strong>
+采用了共享的低秩矩阵和缩放向量，进一步减少了参数数量。</li>
+<li><strong>DoRA</strong>
+通过权重分解，通过方向、幅度两个部分的更新，缩小了PEFT方法和全参数微调的差距。</li>
+</ul></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2024/06/15/LoRA%E7%B1%BB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E6%96%B9%E6%B3%95/">https://lisheng2001.github.io/2024/06/15/LoRA类的大模型微调方法/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%8F%82%E6%95%B0%E9%AB%98%E6%95%88%E5%BE%AE%E8%B0%83/">参数高效微调</a><a class="post-meta__tags" href="/tags/LoRA/">LoRA</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/16/VQAScore-%E6%96%87%E7%94%9F%E5%9B%BE%E8%AF%84%E4%BB%B7%E6%96%B0%E6%8C%87%E6%A0%87/" title="VQAScore: 文生图评价新指标"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">VQAScore: 文生图评价新指标</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/14/%E5%8F%91%E5%B8%83python%E5%8C%85/" title="发布python包"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">发布python包</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#lora-low-rank-adaptation"><span class="toc-number">1.</span> <span class="toc-text">LoRA (Low-Rank Adaptation)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#qlora-quantized-low-rank-adaptation"><span class="toc-number">2.</span> <span class="toc-text">QLoRA (Quantized Low-Rank
+Adaptation)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vera-vector-based-random-matrix-adaptation"><span class="toc-number">3.</span> <span class="toc-text">VeRA (Vector-based
+Random Matrix Adaptation)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dora-weight-decomposed-low-rank-adaptation"><span class="toc-number">4.</span> <span class="toc-text">DoRA
+(Weight-Decomposed Low-Rank Adaptation)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%90%8C%E7%82%B9%E4%B8%8E%E4%B8%8D%E5%90%8C%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">相同点与不同点</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

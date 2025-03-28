@@ -1,0 +1,892 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>评估LLM之在24年的管理类联考逻辑选择题评估 | 一世逍遥的博客</title><meta name="author" content="LiSheng"><meta name="copyright" content="LiSheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="之前回顾了HuggingFace数据集创建以及LLM评估工具的使用，算是对LLM评估有了一定的认识。这次主要是创建一个私有数据集，并在通过lm-evaluation-harness套件在这个数据集上尝试对LLM进行评估，算是实战一下数据集创建和评估工具使用。 创建的数据集从直觉上来说应该尽可能新，以防止泄露到LLM训练数据中，另外数据集本身可能需要一定的权威性和认可度。本文中使用2024年管理类联">
+<meta property="og:type" content="article">
+<meta property="og:title" content="评估LLM之在24年的管理类联考逻辑选择题评估">
+<meta property="og:url" content="https://lisheng2001.github.io/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/index.html">
+<meta property="og:site_name" content="一世逍遥的博客">
+<meta property="og:description" content="之前回顾了HuggingFace数据集创建以及LLM评估工具的使用，算是对LLM评估有了一定的认识。这次主要是创建一个私有数据集，并在通过lm-evaluation-harness套件在这个数据集上尝试对LLM进行评估，算是实战一下数据集创建和评估工具使用。 创建的数据集从直觉上来说应该尽可能新，以防止泄露到LLM训练数据中，另外数据集本身可能需要一定的权威性和认可度。本文中使用2024年管理类联">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lisheng2001.github.io/images/avatar.webp">
+<meta property="article:published_time" content="2025-01-27T08:33:07.000Z">
+<meta property="article:modified_time" content="2025-03-28T15:16:42.464Z">
+<meta property="article:author" content="LiSheng">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="lm-evaluation-harness">
+<meta property="article:tag" content="管理类联考">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lisheng2001.github.io/images/avatar.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://lisheng2001.github.io/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '评估LLM之在24年的管理类联考逻辑选择题评估',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-03-28 23:16:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="一世逍遥的博客"><span class="site-name">一世逍遥的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">评估LLM之在24年的管理类联考逻辑选择题评估</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-28T15:16:42.464Z" title="更新于 2025-03-28 23:16:42">2025-03-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="评估LLM之在24年的管理类联考逻辑选择题评估"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><p>之前回顾了<a
+href="https://lisheng2001.github.io/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/">HuggingFace数据集创建</a>以及<a
+href="https://lisheng2001.github.io/2025/01/04/LLM%E8%AF%84%E4%BC%B0/">LLM评估工具的使用</a>，算是对LLM评估有了一定的认识。这次主要是创建一个私有数据集，并在通过lm-evaluation-harness套件在这个数据集上尝试对LLM进行评估，算是实战一下数据集创建和评估工具使用。</p>
+<p>创建的数据集从直觉上来说应该尽可能新，以防止泄露到LLM训练数据中，另外数据集本身可能需要一定的权威性和认可度。本文中使用2024年管理类联考的逻辑部分试题来作为评估集，手动将该数据集录入为文字版，称为<code>MJEE_2024</code>数据集。</p>
+<h2 id="数据集构建">数据集构建</h2>
+<p>从互联网上获取了2024年管理类联考的真题pdf，之后使用了逻辑推理部分的试题作为评估集。逻辑推理部分的试题全是选择题，便于评估时进行客观计分。</p>
+<p>为了保证pdf转换为Markdown格式过程中数据的准确性，手动复制粘贴并调整格式以达到所有题目都满足同一个格式。格式要求如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;试题序号&gt;.&lt;题干内容&gt;</span><br><span class="line">&lt;选项标签(A/B/C/D/E)&gt;. &lt;选项内容&gt;</span><br><span class="line"></span><br><span class="line">参考答案: &lt;答案选项&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>如果题干内容中涉及到图形等视觉信息，向题干添加<code>#need_image</code>信息标识该题为多模态类型的题目。</p>
+<p>之后，编写脚本将其转化为<code>csv</code>文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取Markdown文件内容</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;管理类联考 逻辑推理题.md&#x27;</span>, <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> file:</span><br><span class="line">    content = file.read()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 正则表达式匹配题目和答案</span></span><br><span class="line">pattern = re.<span class="built_in">compile</span>(<span class="string">r&#x27;\n*(\d+)\.(.*?)\n参考答案：(\w+)\n&#x27;</span>, re.DOTALL)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析题目</span></span><br><span class="line">matches = pattern.findall(content)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将解析结果写入CSV文件</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;math_questions.csv&#x27;</span>, <span class="string">&#x27;w&#x27;</span>, newline=<span class="string">&#x27;&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> csvfile:</span><br><span class="line">    writer = csv.writer(csvfile)</span><br><span class="line">    writer.writerow([<span class="string">&#x27;ID&#x27;</span>, <span class="string">&#x27;Question&#x27;</span>, <span class="string">&#x27;Answer&#x27;</span>])  <span class="comment"># 写入表头</span></span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">match</span> <span class="keyword">in</span> matches:</span><br><span class="line">        question_id = <span class="keyword">match</span>[<span class="number">0</span>]</span><br><span class="line">        question_content = <span class="keyword">match</span>[<span class="number">1</span>].strip()</span><br><span class="line">        answer = <span class="keyword">match</span>[<span class="number">2</span>].strip()</span><br><span class="line">        writer.writerow([question_id, question_content, answer])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;CSV文件已生成：logic_questions.csv&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>由此，我们获得了30道逻辑推理的选择题及答案，其中包含1道需要图像理解的推理题。</p>
+<h2 id="上传huggingface">上传HuggingFace</h2>
+<p><code>csv</code>文件本身已经可以上传HF作为独立的数据集使用。但考虑可扩展性，比如之后我们可以把2024年的数学题、条件推理题也按上述方式处理，并作为一个子集加入到<code>MJEE_2024</code>的话，就需要在数据集的<code>README.md</code>中对整个数据集进行合理的组织。</p>
+<p>例如，按如下结构组织数据集（使用<code>tree \F</code>命令生成）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">│  README.md</span><br><span class="line">│</span><br><span class="line">├─ condition_2024</span><br><span class="line">│      val.csv</span><br><span class="line">│</span><br><span class="line">├─ logic_2024</span><br><span class="line">│      val.csv</span><br><span class="line">│</span><br><span class="line">└─ math_2024</span><br><span class="line">        val.csv</span><br></pre></td></tr></table></figure>
+<p>其中，<code>logic_2024/val.csv</code>就是之前生成的<code>csv</code>文件。</p>
+<p>在<code>README.md</code>中的引言区指明各个数据集子集与csv文件的对应关系及基本信息：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">language:</span><br><span class="line"><span class="bullet">-</span> zh</span><br><span class="line">license:</span><br><span class="line"><span class="bullet">-</span> cc-by-sa-4.0</span><br><span class="line">source<span class="emphasis">_datasets:</span></span><br><span class="line"><span class="emphasis">- original</span></span><br><span class="line"><span class="emphasis">task_</span>categories:</span><br><span class="line"><span class="bullet">-</span> question-answering</span><br><span class="line">task<span class="emphasis">_ids:</span></span><br><span class="line"><span class="emphasis">- open-domain-qa</span></span><br><span class="line"><span class="emphasis">- multiple-choice-qa</span></span><br><span class="line"><span class="emphasis">pretty_</span>name: MJEE</span><br><span class="line">dataset<span class="emphasis">_info:</span></span><br><span class="line"><span class="emphasis">- config_</span>name: logic<span class="emphasis">_2024</span></span><br><span class="line"><span class="emphasis">  features:</span></span><br><span class="line"><span class="emphasis">  - name: ID</span></span><br><span class="line"><span class="emphasis">    dtype: int64</span></span><br><span class="line"><span class="emphasis">  - name: Question</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">  - name: Answer</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">- config_</span>name: math<span class="emphasis">_2024</span></span><br><span class="line"><span class="emphasis">  features:</span></span><br><span class="line"><span class="emphasis">  - name: ID</span></span><br><span class="line"><span class="emphasis">    dtype: int64</span></span><br><span class="line"><span class="emphasis">  - name: Question</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">  - name: Answer</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">- config_</span>name: condition<span class="emphasis">_2024</span></span><br><span class="line"><span class="emphasis">  features:</span></span><br><span class="line"><span class="emphasis">  - name: ID</span></span><br><span class="line"><span class="emphasis">    dtype: int64</span></span><br><span class="line"><span class="emphasis">  - name: Question</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">  - name: Answer</span></span><br><span class="line"><span class="emphasis">    dtype: string</span></span><br><span class="line"><span class="emphasis">configs:</span></span><br><span class="line"><span class="emphasis">- config_</span>name: logic<span class="emphasis">_2024</span></span><br><span class="line"><span class="emphasis">  data_</span>files:</span><br><span class="line"><span class="bullet">  -</span> split: validation</span><br><span class="line"><span class="code">    path: logic_2024/val.csv</span></span><br><span class="line"><span class="code">- config_name: math_2024</span></span><br><span class="line"><span class="code">  data_files:</span></span><br><span class="line"><span class="code">  - split: validation</span></span><br><span class="line"><span class="code">    path: math_2024/val.csv</span></span><br><span class="line"><span class="code">- config_name: condition_2024</span></span><br><span class="line"><span class="code">  data_files:</span></span><br><span class="line"><span class="code">  - split: validation</span></span><br><span class="line"><span class="code">    path: condition_2024/val.csv</span></span><br><span class="line"><span class="code">---</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="section"># Dataset Card for MJEE</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>最后，我们将在这个文件夹上传的HF中，以方便后续调用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">huggingface-cli upload xxx/MJEE ./yyy . --repo-type dataset</span><br></pre></td></tr></table></figure>
+<h2 id="注册任务">注册任务</h2>
+<p>上传完数据集之后，完成了数据集构建和评估任务的解耦，之后更新数据集可以在前两步下手，而后续注册任务和运行评估则可以通过联网获取最新数据集来进行评估结果更新。</p>
+<p>为了注册任务，创建一个新的文件夹<code>lm_eval/tasks/MJEE</code>，在该文件夹下创建一个用于评估2024年逻辑选择题的<code>logic_2024.yaml</code>文件：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">task:</span> <span class="string">MJEE_logic_2024</span></span><br><span class="line"><span class="comment"># 数据集的路径，如果是上传到HF的即`你的用户名/数据集名称`，如果是在本地的直接输入路径即可。</span></span><br><span class="line"><span class="attr">dataset_path:</span> <span class="string">XXX/MJEE</span></span><br><span class="line"><span class="comment"># 数据集子集的名称和划分</span></span><br><span class="line"><span class="attr">dataset_name:</span> <span class="string">logic_2024</span></span><br><span class="line"><span class="attr">validation_split:</span> <span class="string">validation</span></span><br><span class="line"><span class="attr">output_type:</span> <span class="string">generate_until</span></span><br><span class="line"><span class="comment"># 预处理</span></span><br><span class="line"><span class="attr">process_docs:</span> <span class="type">!function</span> <span class="string">utils.process_docs</span></span><br><span class="line"><span class="comment"># 运行评估的prompt</span></span><br><span class="line"><span class="attr">doc_to_text:</span> <span class="string">&quot;阅读并作答以下逻辑题目，注意最终答案必须新起一行并以`#### 答案: [正确选项]`，如`#### 答案: A`。下面是题目。\n<span class="template-variable">&#123;&#123;Question.strip()&#125;&#125;</span>\n&quot;</span></span><br><span class="line"><span class="attr">doc_to_target:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123;Answer&#125;&#125;</span>&quot;</span></span><br><span class="line"><span class="comment"># 生成答案的相关参数</span></span><br><span class="line"><span class="attr">generation_kwargs:</span></span><br><span class="line">  <span class="attr">until:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;&lt;/s&gt;&quot;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;&lt;|im_end|&gt;&quot;</span></span><br><span class="line">  <span class="attr">do_sample:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">temperature:</span> <span class="number">0.0</span></span><br><span class="line">  <span class="attr">max_gen_toks:</span> <span class="number">16000</span></span><br><span class="line"><span class="comment"># 定义怎么提取答案，这边直接使用正则表达式提取</span></span><br><span class="line"><span class="attr">filter_list:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;score-first&quot;</span></span><br><span class="line">    <span class="attr">filter:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">function:</span> <span class="string">&quot;regex&quot;</span></span><br><span class="line">        <span class="attr">regex_pattern:</span> <span class="string">&quot;#### 答案: ([ABCDE])&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">function:</span> <span class="string">&quot;take_first&quot;</span></span><br><span class="line"><span class="comment"># 定义评估指标，因为是单项选择题，可以直接用精确匹配来做，对了得分，反之不得分。</span></span><br><span class="line"><span class="attr">metric_list:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">metric:</span> <span class="string">exact_match</span></span><br><span class="line">    <span class="attr">aggregation:</span> <span class="string">mean</span></span><br><span class="line">    <span class="attr">higher_is_better:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">1.0</span></span><br></pre></td></tr></table></figure>
+<p>为了支持对含有图像题目的过滤，我们在同级目录建立<code>utils.py</code>进行预处理支持：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">question_pattern = <span class="string">r&quot;(.*?)\n([A-E]\. .*(?:\n[A-E]\. .*)*)&quot;</span></span><br><span class="line">options_pattern = <span class="string">r&quot;[A-E]\. .*?(?=\n[A-E]\. |\Z)&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">process_docs</span>(<span class="params">dataset: datasets.Dataset</span>) -&gt; datasets.Dataset:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_process_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="comment"># 可以做一些简单的后处理</span></span><br><span class="line">        <span class="comment"># 但这里不需要，因此直接返回</span></span><br><span class="line">        <span class="keyword">return</span> doc</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_filter_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&quot;#need_image&quot;</span> <span class="keyword">in</span> doc[<span class="string">&quot;Question&quot;</span>]:</span><br><span class="line">            <span class="comment"># 这边对需要图像的示例置False进行过滤</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    dataset = dataset.<span class="built_in">map</span>(_process_doc)</span><br><span class="line">    dataset = dataset.<span class="built_in">filter</span>(_filter_doc)</span><br><span class="line">    <span class="keyword">return</span> dataset</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">process_docs_shuffle</span>(<span class="params">dataset: datasets.Dataset</span>) -&gt; datasets.Dataset:</span><br><span class="line">    <span class="comment"># 在原来的基础上，打乱选项排列以减少记忆题目带来的增益</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_filter_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&quot;#need_image&quot;</span> <span class="keyword">in</span> doc[<span class="string">&quot;Question&quot;</span>]:</span><br><span class="line">            <span class="comment"># 这边对需要图像的示例置None进行过滤</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_process_doc</span>(<span class="params">doc</span>):</span><br><span class="line">        <span class="comment"># 打乱选项</span></span><br><span class="line">        <span class="comment"># 先分离问题和选项</span></span><br><span class="line">        <span class="keyword">match</span> = re.<span class="keyword">match</span>(question_pattern, doc[<span class="string">&quot;Question&quot;</span>], re.DOTALL)</span><br><span class="line">        old_question, old_answer = doc[<span class="string">&quot;Question&quot;</span>], doc[<span class="string">&quot;Answer&quot;</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">match</span>:</span><br><span class="line">            <span class="comment"># 一般正常选项都可以走这个分支</span></span><br><span class="line">            question_body = <span class="keyword">match</span>.group(<span class="number">1</span>).strip()</span><br><span class="line">            options = <span class="keyword">match</span>.group(<span class="number">2</span>).strip()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 将选项拆分为列表</span></span><br><span class="line">            options_list = re.findall(options_pattern, options, re.DOTALL)</span><br><span class="line">            <span class="comment"># 打乱选项</span></span><br><span class="line">            random.shuffle(options_list)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 组合为新问题</span></span><br><span class="line">            <span class="keyword">for</span> i, option <span class="keyword">in</span> <span class="built_in">enumerate</span>(options_list, start=<span class="number">1</span>):</span><br><span class="line">                question_body += <span class="string">f&quot;\n<span class="subst">&#123;<span class="built_in">chr</span>(<span class="number">64</span> + i)&#125;</span>. <span class="subst">&#123;option[<span class="number">3</span>:]&#125;</span>&quot;</span></span><br><span class="line">                <span class="comment"># 处理正确选项的变更</span></span><br><span class="line">                <span class="keyword">if</span> option[<span class="number">0</span>] == doc[<span class="string">&quot;Answer&quot;</span>]:</span><br><span class="line">                    new_answer = <span class="string">f&quot;<span class="subst">&#123;<span class="built_in">chr</span>(<span class="number">64</span> + i)&#125;</span>&quot;</span></span><br><span class="line">            </span><br><span class="line">            doc[<span class="string">&quot;Question&quot;</span>] = question_body</span><br><span class="line">            doc[<span class="string">&quot;Answer&quot;</span>] = new_answer</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> doc</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    dataset = dataset.<span class="built_in">filter</span>(_filter_doc)</span><br><span class="line">    dataset = dataset.<span class="built_in">map</span>(_process_doc)</span><br><span class="line">    <span class="keyword">return</span> dataset</span><br></pre></td></tr></table></figure>
+<p>这里面主要就用到HF的<code>datasets</code>库的filter和map操作。<code>process_docs_shuffle</code>函数是将选项打乱之后的新题目，防止LLM在训练时见过这些题目记住答案从而引入测试误差。可以将打乱后的题目作为一个新的测试项目测试，比如叫<code>logic_2024_shuffle.yaml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">include:</span> <span class="string">logic_2024.yaml</span></span><br><span class="line"><span class="attr">task:</span> <span class="string">MJEE_logic_2024_shuffle</span></span><br><span class="line"><span class="attr">process_docs:</span> <span class="type">!function</span> <span class="string">utils.process_docs_shuffle</span></span><br></pre></td></tr></table></figure>
+<p>可以借助include语法复用之前任务的大部分配置，只需要修改任务名和预处理函数即可。</p>
+<p>这样就把<code>MJEE_logic_2024</code>和<code>MJEE_logic_2024_shuffle</code>任务注册到<code>lm-evaluation-harness</code>中了。</p>
+<h2 id="运行评估">运行评估</h2>
+<p>运行评估很简单，以使用<code>deepseek-chat</code>的api进行评估为例，只需运行：
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">lm_eval --model openai-chat-completions \</span><br><span class="line">    --model_args model=deepseek-chat,base_url=https://api.deepseek.com/v1/chat/completions,max_retries=3,num_concurrent=1,eos_string=<span class="string">&quot;&lt;/s&gt;&quot;</span> \</span><br><span class="line">    --tasks MJEE_logic_2024 \</span><br><span class="line">    --apply_chat_template \</span><br><span class="line">    --log_samples \</span><br><span class="line">    --output_path /root/lm_eval_output \</span><br><span class="line">    --wandb_args project=MJEE_2024,name=deepseek-chat \</span><br></pre></td></tr></table></figure></p>
+<p>如果是想测试一下运行得对不对，可以使用<code>--limit 5</code>这样的参数限制运行的样本数。</p>
+<h2 id="评估对象">评估对象</h2>
+<p>搭好框架之后，可以选几个LLM评估在这个数据集上的效果了。因为有些LLM的API需要绑定银行卡才能调用，选择了下面几个比较调用门槛较低、比较方便的LLM做评估。</p>
+<p>基础模型：</p>
+<ul>
+<li>DeepSeek
+v3：2024年12月份发布的MoE大模型，总参数量671B，激活参数量37B。</li>
+<li>GLM-4-Plus：智谱的旗舰大模型，参数量未知。</li>
+<li>GLM-4-Air：智谱的性价比大模型，参数量未知。</li>
+<li>GLM-4-AirX：据说是极速推理，没有看到和Air有什么明显区别，参数量未知。</li>
+<li>GLM-4-Air-0111：智谱新升级的Air模型，在多个维度上比旧版Air更好。（截至我写这篇博客时，似乎Air-0111已经合入Air模型了，但我测试时这俩是分开的，因此在这也分开避免混淆吧）</li>
+<li>GLM-4-FlashX：GLM的Flash版本似乎是开源的9B模型，FlashX是是GLM-4-Flash模型的增强版本，可能是进行了更好的后训练，参数量可能也是9B。</li>
+<li>Doubao-1.5-pro-32k：字节的主力大模型，参数量未知。</li>
+</ul>
+<p>推理模型：</p>
+<ul>
+<li>DeepSeek
+R1：基于v3基座，通过强化学习诱使模型输出长思维链从而增强了推理能力。</li>
+<li>GLM-Zero-Preview：智谱训练的推理模型。</li>
+</ul>
+<p>有些LLM没开源，因此选择从API价格来入手，以便我们比较不同价格的模型能力差距有多明显：</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 36%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型名称</th>
+<th style="text-align: center;">输入价格（元/1M tokens）</th>
+<th style="text-align: center;">输出价格（元/1M tokens）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">DeepSeek v3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">GLM-4-Plus</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">50</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">GLM-4-Air</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">GLM-4-AirX</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">GLM-4-Air-0111</td>
+<td style="text-align: center;">0.5</td>
+<td style="text-align: center;">0.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">GLM-4-FlashX</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Doubao-1.5-pro-32k</td>
+<td style="text-align: center;">0.8</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DeepSeek R1</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">GLM-Zero-Preview</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">10</td>
+</tr>
+</tbody>
+</table>
+<p>需要注意的是，我测试时DeepSeek的API尚处于优惠期，而且调用也很快。但是现在价格已经涨回去了，临时优惠的价格并不能很好地反映其真实推理成本，因此这边还是用正常价格。</p>
+<h2 id="评估结果">评估结果</h2>
+<p>终于要开始评估了，直接配置好API的端点，然后设置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> OPENAI_API_KEY = xxx（对应的API KEY）</span><br></pre></td></tr></table></figure>
+<p>之后按<a href="#运行评估">运行评估</a>章节的命令启动评估即可。</p>
+<p>首先所有模型都是一次测试的结果，测试结果无法排除偶然因素。而且实际测试的题目只有29道逻辑选择题而已，一方面覆盖面不够广，不一定能反映模型真实能力；另一方面选择题也有运气好蒙对的可能。总之，这个评估结果就是对上面这个评估任务的一次实操，攒经验的，并不是真正严谨地测评这些模型的能力。</p>
+<h3 id="逻辑题评估结果">逻辑题评估结果</h3>
+<p>测评结果如下所示。使用了绿色柱状图标识推理模型，基础模型则使用蓝色柱状图。</p>
+<details open>
+<summary>
+MJEE_logic_2024上的评估结果
+</summary>
+<pre style="background-color: #fff; color: #000; white-space: normal;">
+    <div style="height: 60vh; margin: 0; padding: 0;">
+      <!-- 第一次要先引入ECharts -->
+      <div id="container1" style="height: 100%; width: 100%; "></div>
+      <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/echarts.min.js"></script>
+      <!-- 图表代码 -->
+      <script type="text/javascript">
+        var dom1 = document.getElementById('container1');
+        var myChart1 = echarts.init(dom1);
+        var option1;
+        option1 = {
+          toolbox: {
+            show: true,
+            right: 120,
+            orient: 'horizontal',
+            itemSize: '13',
+            itemGrap: '10',
+            feature: {
+              mySortAsc: {
+                show: true,
+                title: '升序',
+                icon: 'path://M213.333333 256v597.333333H128V256H42.666667l128-128 128 128zM341.333333 213.333333V128h554.666667v85.333333H341.333333z m0 213.333334V341.333333h426.666667v85.333334H341.333333z m0 426.666666v-85.333333h170.666667v85.333333H341.333333z m0-213.333333v-85.333333h298.666667v85.333333H341.333333z',
+                onclick: function () {
+                  option1.dataset[1].transform.config.order = 'asc';
+                  option1.series.datasetIndex = 1; // Make sure to use the transformed dataset.
+                  myChart1.setOption(option1);
+                }
+              },
+              mySortDesc: {
+                show: true,
+                title: '降序',
+                icon: 'path://M256 725.333333h85.333333l-128 128-128-128h85.333334V128h85.333333zM384 213.333333V128h554.666667v85.333333H384z m0 213.333334V341.333333h426.666667v85.333334H384z m0 426.666666v-85.333333h170.666667v85.333333H384z m0-213.333333v-85.333333h298.666667v85.333333H384z',
+                onclick: function () {
+                  option1.dataset[1].transform.config.order = 'desc';
+                  option1.series.datasetIndex = 1; // Make sure to use the transformed dataset.
+                  myChart1.setOption(option1);
+                }
+              },
+              mySortDefault: {
+                show: true,
+                title: '默认',
+                icon: 'path://M209.70454467 879.20960567c-5.875271 0-10.654409-4.779138-10.654408-10.654409V644.54953967l-15.536796-2.493525c-31.032575-4.979978-56.064-13.043271-70.480619-22.701967-14.058785-9.422497-32.441282-34.391691-30.946298-56.355359 9.59505-13.276641 59.273193-62.200928 92.643713-95.063691 50.523934-49.755934 73.312177-72.569635 79.490121-82.209944 0.74537-1.164022 2.169635-1.337989 2.951779-1.337989 0.531801 0 2.335116 0.106077 3.221923 1.463867 4.337856 6.643271 19.649768 21.888707 62.299934 63.768044 35.78484 35.137061 101.970033 100.125702 110.37843 114.235404 2.671735 10.42811 2.089017 37.869613-29.763889 54.465768-20.827934 10.851006-47.733392 18.884597-79.969591 23.880132l-15.634387 2.422807v125.933613h531.900111c5.875271 0 10.654409 4.779138 10.654408 10.654409v87.345503c0 5.875271-4.779138 10.654409-10.654408 10.654409H209.70454467zM792.13848967 653.52085467c-0.533215 0-2.339359-0.106077-3.22758-1.468111-4.333613-6.639028-19.654011-21.894365-62.328221-63.797746-35.774939-35.128575-101.940331-100.097414-110.347315-114.202872-2.67032-10.426696-2.086188-37.868199 29.769547-54.46294 20.829348-10.851006 47.733392-18.886011 79.963934-23.881547l15.635801-2.422806v-125.933614h-531.900111c-5.875271 0-10.654409-4.777724-10.654408-10.648751v-87.349746c0-5.875271 4.779138-10.654409 10.654408-10.654409H839.60456767c5.875271 0 10.654409 4.779138 10.654408 10.654409v224.004243l15.533967 2.49494c31.045304 4.98705 56.076729 13.048928 70.482033 22.701966 14.060199 9.422497 32.442696 34.391691 30.947713 56.356774-9.59505 13.27947-59.277436 62.206586-92.647956 95.070762-50.518276 49.751691-73.303691 72.563978-79.481635 82.202873-0.746785 1.162608-2.17105 1.336575-2.954608 1.336575z',
+                onclick: function () {
+                  // Use the original dataset (index 0) to restore the original order.
+                  option1.series.datasetIndex = 0;
+                  myChart1.setOption(option1);
+                }
+              }
+            }
+          },
+          dataset: [
+            {
+              dimensions: ['name', 'score'],
+              source: [
+                ['DeepSeek v3', 68.97],
+                ['GLM-4-Plus', 72.41],
+                ['GLM-4-Air', 62.07],
+                ['GLM-4-AirX', 62.07],
+                ['GLM-4-Air-0111', 65.52],
+                ['GLM-4-FlashX', 51.72],
+                ['Doubao-1.5-pro-32k', 79.31],
+                ['DeepSeek R1', 96.55],
+                ['GLM-Zero-Preview', 58.62]
+              ]
+            },
+            {
+              transform: {
+                type: 'sort',
+                config: { dimension: 'score', order: 'desc' }
+              }
+            }
+          ],
+          xAxis: {
+            type: 'category',
+            axisLabel: { interval: 0, rotate: 30 }
+          },
+          yAxis: {},
+          series: {
+            type: 'bar',
+            encode: { x: 'name', y: 'score' },
+            datasetIndex: 1,
+            itemStyle: {
+              // 添加 itemStyle
+              color: function (params) {
+                // 直接使用当前数据项的模型名称（排序后的数据集）
+                const modelName = params.value[0]; // value数组的第一个元素是name
+                if (modelName === 'DeepSeek R1' || modelName === 'GLM-Zero-Preview') {
+                  return '#91CC75';
+                } else {
+                  return '#5470C6';
+                }
+              }
+            },
+            label: {
+              show: true,
+              position: 'top'
+            }
+          }
+        };
+        if (option1 && typeof option1 === 'object') {
+          myChart1.setOption(option1);
+        }
+        window.addEventListener('resize', myChart1.resize);
+        myChart1.resize();
+      </script>
+  </pre>
+</details>
+<p>基础模型组里，我觉得智谱、DeepSeek和豆包的旗舰模型表现都是可比的。豆包在这个任务上更如鱼得水一些，<code>Doubao-1.5-pro-32k</code>以79.31分和实惠的API价格拿下基础模型组的第一。<code>GLM-4-Plus</code>稍好于<code>DeepSeek v3</code>，但要算经济账的话，我个人会更倾向于v3一些。智谱的高性价比模型<code>GLM-4-Air-0111</code>以很小的差距追逐<code>DeepSeek v3</code>，考虑到前者的成本只有后者的25%以下，这个结果还是不错的。</p>
+<p><code>GLM-4-FlashX</code>、<code>GLM-4-AirX</code>这样的模型延迟是比较低的，在评测的时候能感觉出来是轻快的模型。但这里主要评估的是正确率，因此小模型可能会比较吃亏。</p>
+<p>推理模型中，<code>DeepSeek R1</code>以绝对的优势拿下第一，并且在逻辑选择题中展现了对基础模型绝对的统治力。29题里只错1题，可以认为和前面的基础模型组的模型有显著差异。反观<code>GLM-Zero-Preview</code>则不那么乐观，似乎它更多地对数学题进行了优化，对这种纯逻辑题有点吃力，性能相对来说比较羸弱。不过是preview版本也还行了，毕竟是去年12月份的模型，时间比较紧张，可能重点去优化了AIME、MATH500这样的benchmark。</p>
+<h3 id="打乱选项后的逻辑题评估结果">打乱选项后的逻辑题评估结果</h3>
+<p>其实评完还是有些疑惑的，因为这些模型里面不乏新模型，很可能它们已经在这个资料上训练过，记住答案了。因此，为了减少记忆带来的结果虚高，也在打乱选项（即<code>MJEE_logic_2024_shuffle</code>任务）的设置下重新评测了基础模型。图表中用蓝色条表示打乱前的评估分数，绿色条表示打乱选项后的评估分数。</p>
+<details open>
+<summary>
+MJEE_logic_2024_shuffle上基础模型的评估结果
+</summary>
+<pre style="background-color: #fff; color: #000; white-space: normal;">
+    <div style="height: 60vh; margin: 0; padding: 0;">
+      <div id="container2" style="height: 100%; width: 100%; "></div>
+      <!-- 图表代码 -->
+      <script type="text/javascript">
+        var dom2 = document.getElementById('container2');
+        var myChart2 = echarts.init(dom2);
+        var option2;
+        option2 = {
+          toolbox: {
+            show: true,
+            right: 120,
+            orient: 'horizontal',
+            itemSize: '13',
+            itemGrap: '10',
+            feature: {
+              mySortAsc: {
+                show: true,
+                title: '升序',
+                icon: 'path://M213.333333 256v597.333333H128V256H42.666667l128-128 128 128zM341.333333 213.333333V128h554.666667v85.333333H341.333333z m0 213.333334V341.333333h426.666667v85.333334H341.333333z m0 426.666666v-85.333333h170.666667v85.333333H341.333333z m0-213.333333v-85.333333h298.666667v85.333333H341.333333z',
+                onclick: function () {
+                  option2.dataset[1].transform.config.order = 'asc';
+                  option2.series.forEach(function (s) {
+                    s.datasetIndex = 1;
+                  });
+                  myChart2.setOption(option2);
+                }
+              },
+              mySortDesc: {
+                show: true,
+                title: '降序',
+                icon: 'path://M256 725.333333h85.333333l-128 128-128-128h85.333334V128h85.333333zM384 213.333333V128h554.666667v85.333333H384z m0 213.333334V341.333333h426.666667v85.333334H384z m0 426.666666v-85.333333h170.666667v85.333333H384z m0-213.333333v-85.333333h298.666667v85.333333H384z',
+                onclick: function () {
+                  option2.dataset[1].transform.config.order = 'desc';
+                  option2.series.forEach(function (s) {
+                    s.datasetIndex = 1;
+                  });
+                  myChart2.setOption(option2);
+                }
+              },
+              mySortDefault: {
+                show: true,
+                title: '默认',
+                icon: 'path://M209.70454467 879.20960567c-5.875271 0-10.654409-4.779138-10.654408-10.654409V644.54953967l-15.536796-2.493525c-31.032575-4.979978-56.064-13.043271-70.480619-22.701967-14.058785-9.422497-32.441282-34.391691-30.946298-56.355359 9.59505-13.276641 59.273193-62.200928 92.643713-95.063691 50.523934-49.755934 73.312177-72.569635 79.490121-82.209944 0.74537-1.164022 2.169635-1.337989 2.951779-1.337989 0.531801 0 2.335116 0.106077 3.221923 1.463867 4.337856 6.643271 19.649768 21.888707 62.299934 63.768044 35.78484 35.137061 101.970033 100.125702 110.37843 114.235404 2.671735 10.42811 2.089017 37.869613-29.763889 54.465768-20.827934 10.851006-47.733392 18.884597-79.969591 23.880132l-15.634387 2.422807v125.933613h531.900111c5.875271 0 10.654409 4.779138 10.654408 10.654409v87.345503c0 5.875271-4.779138 10.654409-10.654408 10.654409H209.70454467zM792.13848967 653.52085467c-0.533215 0-2.339359-0.106077-3.22758-1.468111-4.333613-6.639028-19.654011-21.894365-62.328221-63.797746-35.774939-35.128575-101.940331-100.097414-110.347315-114.202872-2.67032-10.426696-2.086188-37.868199 29.769547-54.46294 20.829348-10.851006 47.733392-18.886011 79.963934-23.881547l15.635801-2.422806v-125.933614h-531.900111c-5.875271 0-10.654409-4.777724-10.654408-10.648751v-87.349746c0-5.875271 4.779138-10.654409 10.654408-10.654409H839.60456767c5.875271 0 10.654409 4.779138 10.654408 10.654409v224.004243l15.533967 2.49494c31.045304 4.98705 56.076729 13.048928 70.482033 22.701966 14.060199 9.422497 32.442696 34.391691 30.947713 56.356774-9.59505 13.27947-59.277436 62.206586-92.647956 95.070762-50.518276 49.751691-73.303691 72.563978-79.481635 82.202873-0.746785 1.162608-2.17105 1.336575-2.954608 1.336575z',
+                onclick: function () {
+                  // Use the original dataset (index 0) to restore the original order.
+                  option2.series.forEach(function (s) {
+                    s.datasetIndex = 0;
+                  });
+                  myChart2.setOption(option2);
+                }
+              }
+            }
+          },
+          dataset: [
+            {
+              dimensions: ['name', 'score', 'score_shuffle'],
+              source: [
+                ['DeepSeek v3', 68.97, 68.97],
+                ['GLM-4-Plus', 72.41, 75.86],
+                ['GLM-4-Air', 62.07, 68.97],
+                ['GLM-4-AirX', 62.07, 62.07],
+                ['GLM-4-Air-0111', 65.52, 62.07],
+                ['GLM-4-FlashX', 51.72, 44.83],
+                ['Doubao-1.5-pro-32k', 79.31, 82.76],
+              ]
+            },
+            {
+              transform: {
+                type: 'sort',
+                config: { dimension: 'score_shuffle', order: 'desc' }
+              }
+            }
+          ],
+          xAxis: {
+            type: 'category',
+            axisLabel: { interval: 0, rotate: 30 }
+          },
+          yAxis: {},
+          series: [{
+            type: 'bar',
+            encode: { x: 'name', y: 'score' },
+            datasetIndex: 1,
+            label: {
+              show: true,
+              position: 'top'
+            }
+          }, 
+          {
+            type: 'bar',
+            encode: { x: 'name', y: 'score_shuffle' },
+            datasetIndex: 1,
+            label: {
+              show: true,
+              position: 'top'
+            }
+          }]
+        };
+        if (option2 && typeof option2 === 'object') {
+          myChart2.setOption(option2);
+        }
+        window.addEventListener('resize', myChart2.resize);
+        myChart2.resize();
+      </script>
+  </pre>
+</details>
+<p>可以发现，除了小模型GLM-4-FlashX浮动2题之外，大部分基础模型的浮动范围都在1道题以内。至少在打乱选项设置下，可以说这些基础模型应该是展现了它们的推理能力而不是记忆力。</p>
+<p>尽管为了严谨应该也对推理模型进行一次<code>MJEE_logic_2024_shuffle</code>任务的测试，但看了<code>DeepSeek R1</code>的论文，它就是用结果监督的进行强化学习的。如果训练的是选择题那也很容易Reward
+Hacking，DeepSeek应该有意避免了在强化学习时使用选择题，因此这里不严谨地不进行测试。</p>
+<h2 id="细粒度分析">细粒度分析</h2>
+<p>除了得到这么一个正确率指标，我们还能进行更细粒度地分析吗？</p>
+<h3 id="llm答题具体情况如何">LLM答题具体情况如何？</h3>
+<p>把目标聚焦在<code>DeepSeek v3</code>、<code>GLM-4-Plus</code>、<code>Doubao-1.5-pro-32k</code>和<code>DeepSeek R1</code>上，也许会想知道它们具体答对了哪些题目，从答对和答错题目的分布上分析出一点东西。</p>
+<p>在看过具体数据后，发现除了答对和答错之外，还有一个特殊情况，就是正则表达式匹配失败了，不知道模型选了什么。因此，将结果标签分为-1（答案解析失败）、0（错误）和1（正确）三类。将9个LLM在29道题上的答题情况以热力图的形式进行展现：</p>
+<details open>
+<summary>
+细粒度的热力图
+</summary>
+<pre style="background-color: #fff; color: #000; white-space: normal;">
+    <div style="height: 80vh; margin: 0; padding: 0;">
+      <div id="container3" style="height: 100%; width: 100%; "></div>
+      <!-- 图表代码 -->
+      <script type="text/javascript">
+        var dom3 = document.getElementById('container3');
+        var myChart3 = echarts.init(dom3);
+        var option3;
+        var jsonString = '{"DeepSeek v3": {"26": 1, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 1, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 1, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 1, "53": 1, "54": 0, "55": 0}, "DeepSeek R1": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 1, "33": 0, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 1, "40": 1, "41": 1, "42": 1, "43": 1, "44": 1, "46": 1, "47": 1, "48": 1, "49": 1, "50": 1, "51": 1, "52": 1, "53": 1, "54": 1, "55": 1}, "Doubao-1.5-pro-32k": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 1, "33": 1, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 0, "40": 1, "41": 1, "42": 1, "43": 0, "44": 0, "46": 1, "47": 1, "48": 1, "49": 1, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 1}, "GLM-4-Air": {"26": 0, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 1, "44": 1, "46": 0, "47": 1, "48": 1, "49": 0, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-Air-0111": {"26": -1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 0, "36": 1, "37": 1, "38": 1, "39": 0, "40": 1, "41": 1, "42": -1, "43": -1, "44": 1, "46": 1, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 1}, "GLM-4-AirX": {"26": 0, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 1, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 1, "51": 1, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-FlashX": {"26": 1, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 0, "36": 0, "37": 1, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 1, "47": 0, "48": 0, "49": 1, "50": 0, "51": 0, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-Plus": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 1, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 1, "53": 1, "54": 0, "55": 0}, "GLM-Zero-Preview": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": -1, "32": 0, "33": -1, "34": 0, "35": 1, "36": 1, "37": -1, "38": 1, "39": -1, "40": -1, "41": 1, "42": 1, "43": 1, "44": 1, "46": 1, "47": 0, "48": -1, "49": 1, "50": 0, "51": -1, "52": 1, "53": 1, "54": -1, "55": 1}}';
+        // 解析字符串为 JSON 对象
+        var rawData = JSON.parse(jsonString);
+        var data = [];
+        var models = Object.keys(rawData);
+        var questions = Array.from({ length: 30 }, (_, i) => i + 26).filter(q => q !== 45);
+        // 计算每个模型的正确率
+        var accuracyData = models.map(model => {
+            var correctCount = questions.reduce((acc, q) => acc + (rawData[model][q] === 1 ? 1 : 0), 0);
+            return (correctCount / questions.length * 100).toFixed(2);
+        });
+        models.forEach((model, modelIndex) => {
+            questions.forEach((q, qIndex) => {
+                if (rawData[model][q] !== undefined) {
+                    data.push([qIndex, modelIndex, rawData[model][q]]);
+                }
+            });
+        });
+        option3 = {
+            tooltip: {
+                position: 'top',
+                formatter: function (params) {
+                    var value = params.value[2];
+                    var result = value === 1 ? '正确' : value === 0 ? '错误' : '答案解析失败';
+                    return `${models[params.value[1]]} - ${questions[params.value[0]]}题: ${result}`;
+                }
+            },
+            grid: {
+                height: '75%',
+                top: '10%',
+                left: '25%',
+                right: '10%',
+                bottom: '10%'
+            },
+            xAxis: {
+                type: 'category',
+                data: questions.map(q => q + '题'),
+                splitArea: { show: true }
+            },
+            yAxis: {
+                type: 'category',
+                data: models.map((model, index) => `${model} (${accuracyData[index]}%)`),
+                splitArea: { show: true }
+            },
+            visualMap: {
+                min: -1,
+                max: 1,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '5%',
+                inRange: {
+                    color: ['#D3D3D3', '#FF6B6B','#4CAF50']
+                }
+            },
+            series: [{
+                name: '答题结果',
+                type: 'heatmap',
+                data: data,
+                label: {
+                    show: true,
+                    color: '#fff',
+                    formatter: function (params) {
+                        return params.value[2] === 1 ? '✔' : params.value[2] === 0 ? '✘' : '?';
+                    }
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
+        };
+        if (option3 && typeof option3 === 'object') {
+          myChart3.setOption(option3);
+        }
+        window.addEventListener('resize', myChart3.resize);
+        myChart3.resize();
+      </script>
+  </pre>
+</details>
+<p>观察这个热力图，我们可以发现几个非常有趣的结论：</p>
+<ol type="1">
+<li>尽管<code>DeepSeek R1</code>一骑绝尘，29题中只错一题，可是错的那个33题实在是有些匪夷所思。33题除了同为推理模型的<code>GLM-Zero-Preview</code>答案解析错误之外，就连最小的FlashX模型都答对了。推理模型在简单问题上犯错，这个现象在openai的o3模型上也有发现，比如在<a
+target="_blank" rel="noopener" href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC
+Prize的这篇博客</a>中：</li>
+</ol>
+<blockquote>
+<p>In particular, we are very curious about the ~9% set of Public Eval
+tasks o3 was unable to solve, even with lots of compute, yet are
+straightforward for humans.</p>
+<p>特别是，我们对约 9% 的公共评估任务感到非常好奇，这些任务 o3
+即使投入大量计算资源也无法解决，然而对人类来说却很简单。</p>
+</blockquote>
+<p>目前的推理模型在这种逻辑题上占很大便宜，但它们依旧有可能在人类觉得简单的题目上犯错误，甚至是基础模型觉得简单的题目也有概率会出错。说明目前的推理模型还是有进步空间。</p>
+<ol start="2" type="1">
+<li><code>GLM-Zero-Preview</code>居然有8道题解析失败，等于8道题答题卡不涂就交卷了。总共才29道题，也难怪分数不高的。这只能怪模型本身，因为按格式输出答案本身也是指令遵循能力的一部分。这边主要关注一下它为什么解析失败。</li>
+</ol>
+<p>查找到了它解析失败的题目，发现它把答案格式化成这样了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">**答案: A**</span><br><span class="line">或者</span><br><span class="line">**最终答案：**\n\n\\[\\boxed&#123;D&#125;\\]</span><br></pre></td></tr></table></figure>
+<p>看到这个<code>\boxed&#123;X&#125;</code>，感觉可能是用来强化学习的数据太单调了，大部分可能是数学题。在微调时模型错误地学习了答案要放到boxed里面，也算是过拟合了吧。毕竟是preview版本，可能目前就针对数学题强化学习过，指令遵循能力差可能是训练数据多样性的问题。像R1那样也针对非数学领域的进行微调和强化学习也许就能重新找回指令遵循能力。</p>
+<p>抛开指令遵循能力，人工评估<code>GLM-Zero-Preview</code>的结果，发现答案解析错误的8题里面居然对了5题。那么其实最后纯算推理的话它的得分是<span
+class="math inline">\((5+17)/29=75.86\%\)</span>，也算挽尊了一手。</p>
+<ol start="3" type="1">
+<li>还有一个有趣的发现是怎么指令遵循得好好的<code>GLM-4-Air</code>升级到0111版本之后，反倒指令遵循出问题然后出现3个无法解析的答案呢？</li>
+</ol>
+<p>我也不知道具体原因，但结合<code>GLM-Zero-Preview</code>的表现和<code>DeepSeek v3</code>的技术报告，我猜想<code>GLM-4-Air-0111</code>版本可能也和v3增强推理能力的方式类似，从<code>GLM-Zero-Preview</code>拒绝采样了一批数据用于微调0111版本，以增强0111模型的数学能力。但可能受限于模型大小和数据配比，让推理模型指令不遵循的问题”遗传“到<code>GLM-4-Air-0111</code>版本了。</p>
+<p>如果抛开指令遵循能力，手动验证无法解析答案的题目之后，<code>GLM-4-Air-0111</code>在3题中做对2题，得分是<span
+class="math inline">\((19+2)/29=72.41\%\)</span>，还是挺可惜的。</p>
+<ol start="4" type="1">
+<li>豆包模型在这个任务上很厉害，而且也比较实惠。正好v3的api也比较繁忙，也许可以尝试使用豆包1.5pro去替代一下。</li>
+</ol>
+<h3 id="题目难度如何">题目难度如何？</h3>
+<p>9个LLM，相当于9个学生在答题了。kimi
+1.5论文里介绍了一种基于SFT模型的提示难度判断方法：</p>
+<blockquote>
+<p>We adopt a model-based approach that leverages the model’s own
+capacity to adaptively assess the difficulty of each prompt.
+Specifically, for every prompt, an SFT model generates answers ten times
+using a relatively high sampling temperature. The pass rate is then
+calculated and used as a proxy for the prompt’s difficulty—the lower the
+pass rate, the higher the difficulty. This approach allows difficulty
+evaluation to be aligned with the model’s intrinsic capabilities, making
+it highly effective for RL training. By leveraging this method, we can
+prefilter most trivial cases and easily explore different sampling
+strategies during RL training.</p>
+<p>我们采用一种基于模型的方法，利用模型自身的能力来适应性地评估每个提示的难度。具体来说，对于每个提示，一个
+SFT
+模型使用相对较高的采样温度生成答案十次。然后计算通过率，并将其作为提示难度的代理指标——通过率越低，难度越高。这种方法使难度评估与模型的内在能力保持一致，对于强化学习训练非常有效。通过利用这种方法，我们可以预先过滤掉大多数简单的案例，并在强化学习训练期间轻松探索不同的采样策略。</p>
+</blockquote>
+<p>我们这里不是要训练什么模型，只是单纯地判断一下题目的难度。类似地，我们也计算9个LLM对这些题目的通过率，将这个通过率作为题目难度的代理指标。</p>
+<details open>
+<summary>
+题目难度热力图
+</summary>
+<pre style="background-color: #fff; color: #000; white-space: normal;">
+    <div style="height: 50vh; margin: 0; padding: 0;">
+      <div id="container5" style="height: 100%; width: 100%; "></div>
+      <!-- 图表代码 -->
+      <script type="module">
+        var dom5 = document.getElementById('container5');
+        var myChart5 = echarts.init(dom5);
+        var option5;
+        var jsonString = '{"DeepSeek v3": {"26": 1, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 1, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 1, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 1, "53": 1, "54": 0, "55": 0}, "DeepSeek R1": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 1, "33": 0, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 1, "40": 1, "41": 1, "42": 1, "43": 1, "44": 1, "46": 1, "47": 1, "48": 1, "49": 1, "50": 1, "51": 1, "52": 1, "53": 1, "54": 1, "55": 1}, "Doubao-1.5-pro-32k": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 1, "33": 1, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 0, "40": 1, "41": 1, "42": 1, "43": 0, "44": 0, "46": 1, "47": 1, "48": 1, "49": 1, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 1}, "GLM-4-Air": {"26": 0, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 1, "44": 1, "46": 0, "47": 1, "48": 1, "49": 0, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-Air-0111": {"26": -1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 0, "36": 1, "37": 1, "38": 1, "39": 0, "40": 1, "41": 1, "42": -1, "43": -1, "44": 1, "46": 1, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 0, "53": 1, "54": 0, "55": 1}, "GLM-4-AirX": {"26": 0, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 0, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 1, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 1, "51": 1, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-FlashX": {"26": 1, "27": 1, "28": 1, "29": 0, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 0, "36": 0, "37": 1, "38": 1, "39": 0, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 1, "47": 0, "48": 0, "49": 1, "50": 0, "51": 0, "52": 0, "53": 1, "54": 0, "55": 0}, "GLM-4-Plus": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": 1, "32": 0, "33": 1, "34": 1, "35": 1, "36": 1, "37": 1, "38": 1, "39": 1, "40": 0, "41": 1, "42": 1, "43": 0, "44": 1, "46": 0, "47": 0, "48": 1, "49": 1, "50": 0, "51": 1, "52": 1, "53": 1, "54": 0, "55": 0}, "GLM-Zero-Preview": {"26": 1, "27": 1, "28": 1, "29": 1, "30": 1, "31": -1, "32": 0, "33": -1, "34": 0, "35": 1, "36": 1, "37": -1, "38": 1, "39": -1, "40": -1, "41": 1, "42": 1, "43": 1, "44": 1, "46": 1, "47": 0, "48": -1, "49": 1, "50": 0, "51": -1, "52": 1, "53": 1, "54": -1, "55": 1}}';
+        var rawData = JSON.parse(jsonString);
+        var models = Object.keys(rawData);
+        var questions = Array.from({ length: 30 }, (_, i) => i + 26).filter(q => q !== 45);
+        var passRates = questions.map(q => {
+            var correctCount = models.reduce((acc, model) => acc + (rawData[model][q] === 1 ? 1 : 0), 0);
+            return correctCount / models.length;
+        });
+        var data = questions.map((q, index) => [index, 0, passRates[index]]);
+        var option5 = {
+            tooltip: {
+                position: 'top',
+                formatter: function (params) {
+                    return `${questions[params.value[0]]}题: 通过率 ${(params.value[2] * 100).toFixed(2)}%`;
+                }
+            },
+            grid: {
+                height: '50%',
+                top: '20%',
+                left: '10%',
+                right: '10%',
+                bottom: '20%'
+            },
+            xAxis: {
+                type: 'category',
+                data: questions.map(q => q + '题'),
+                splitArea: { show: true },
+                axisLabel: {
+                    interval: 0,
+                    rotate: 30
+                }
+            },
+            yAxis: {
+                type: 'category',
+                data: ['通过率'],
+                splitArea: { show: true }
+            },
+            visualMap: {
+                min: 0,
+                max: 1,
+                calculable: true,
+                orient: 'horizontal',
+                left: 'center',
+                bottom: '5%',
+                inRange: {
+                    color: ['#FF6B6B', '#FFB6B6', '#D3D3D3', '#B6FFB6', '#4CAF50']
+                }
+            },
+            series: [{
+                name: '题目难度',
+                type: 'heatmap',
+                data: data,
+                label: {
+                    show: false,
+                    color: '#000',
+                    formatter: function (params) {
+                        return (params.value[2] * 100).toFixed(0) + '%';
+                    }
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
+        };
+        if (option5 && typeof option5 === 'object') {
+          myChart5.setOption(option5);
+        }
+        window.addEventListener('resize', myChart5.resize);
+        myChart5.resize();
+      </script>
+  </pre>
+</details>
+<p>如图所示，通过率越靠近0的红色越深，也代表题目的难度越大。反之，越靠近1的绿色越深，代表题目难度越小。可以发现54题非常困难，只有<code>DeepSeek R1</code>一个人做对。也有一些通过率为100%的简单题。整体来说前面的题目比较简单，后面的题目中开始混入难题了。</p>
+<p>需要注意的是，因为这里面有很多<code>GLM</code>家族的模型，因此通过率被这些智谱的模型主导了。如果你真的需要通过基于模型的方法对训练数据进行打标，那么使用k1.5的工作流程是更科学的。</p>
+<h2 id="总结">总结</h2>
+<p>本文从2024年管理类联考的真题中抽取了30道逻辑推理的选择题，并通过lm-evaluation-harness对选定的几个大模型进行了评估。不仅通过正确率获取了宏观结果，还通过热力图展示了各种LLM的细粒度答题情况，通过通过率展示了题目的难度情况。算是一次对LLM评估流程全面的实践。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io">LiSheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://lisheng2001.github.io/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/">https://lisheng2001.github.io/2025/01/27/评估LLM之在24年的管理类联考逻辑选择题评估/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://lisheng2001.github.io" target="_blank">一世逍遥的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/lm-evaluation-harness/">lm-evaluation-harness</a><a class="post-meta__tags" href="/tags/%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83/">管理类联考</a></div><div class="post_share"><div class="social-share" data-image="/images/avatar.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">从3篇论文回顾2024年基础大语言模型的进展</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">在hexo博客中插入echarts图表</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/08/14/20230807-20230814%E8%BF%91%E5%86%B5/" title="20230807~20230814近况"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-14</div><div class="title">20230807~20230814近况</div></div></a></div><div><a href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-28</div><div class="title">从3篇论文回顾2024年基础大语言模型的进展</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LiSheng</div><div class="author-info__description">也无风雨也无晴</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">71</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/LiSheng2001"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E6%9E%84%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">数据集构建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8A%E4%BC%A0huggingface"><span class="toc-number">2.</span> <span class="toc-text">上传HuggingFace</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E4%BB%BB%E5%8A%A1"><span class="toc-number">3.</span> <span class="toc-text">注册任务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E8%AF%84%E4%BC%B0"><span class="toc-number">4.</span> <span class="toc-text">运行评估</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E5%AF%B9%E8%B1%A1"><span class="toc-number">5.</span> <span class="toc-text">评估对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E7%BB%93%E6%9E%9C"><span class="toc-number">6.</span> <span class="toc-text">评估结果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E9%A2%98%E8%AF%84%E4%BC%B0%E7%BB%93%E6%9E%9C"><span class="toc-number">6.1.</span> <span class="toc-text">逻辑题评估结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%93%E4%B9%B1%E9%80%89%E9%A1%B9%E5%90%8E%E7%9A%84%E9%80%BB%E8%BE%91%E9%A2%98%E8%AF%84%E4%BC%B0%E7%BB%93%E6%9E%9C"><span class="toc-number">6.2.</span> <span class="toc-text">打乱选项后的逻辑题评估结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%86%E7%B2%92%E5%BA%A6%E5%88%86%E6%9E%90"><span class="toc-number">7.</span> <span class="toc-text">细粒度分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#llm%E7%AD%94%E9%A2%98%E5%85%B7%E4%BD%93%E6%83%85%E5%86%B5%E5%A6%82%E4%BD%95"><span class="toc-number">7.1.</span> <span class="toc-text">LLM答题具体情况如何？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E9%9A%BE%E5%BA%A6%E5%A6%82%E4%BD%95"><span class="toc-number">7.2.</span> <span class="toc-text">题目难度如何？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/03/28/%E4%BB%8E3%E7%AF%87%E8%AE%BA%E6%96%87%E5%9B%9E%E9%A1%BE2024%E5%B9%B4%E5%9F%BA%E7%A1%80%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BF%9B%E5%B1%95/" title="从3篇论文回顾2024年基础大语言模型的进展">从3篇论文回顾2024年基础大语言模型的进展</a><time datetime="2025-03-28T13:03:49.000Z" title="发表于 2025-03-28 21:03:49">2025-03-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/27/%E8%AF%84%E4%BC%B0LLM%E4%B9%8B%E5%9C%A824%E5%B9%B4%E7%9A%84%E7%AE%A1%E7%90%86%E7%B1%BB%E8%81%94%E8%80%83%E9%80%BB%E8%BE%91%E9%80%89%E6%8B%A9%E9%A2%98%E8%AF%84%E4%BC%B0/" title="评估LLM之在24年的管理类联考逻辑选择题评估">评估LLM之在24年的管理类联考逻辑选择题评估</a><time datetime="2025-01-27T08:33:07.000Z" title="发表于 2025-01-27 16:33:07">2025-01-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/23/%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%8F%92%E5%85%A5echarts%E5%9B%BE%E8%A1%A8/" title="在hexo博客中插入echarts图表">在hexo博客中插入echarts图表</a><time datetime="2025-01-23T03:59:36.000Z" title="发表于 2025-01-23 11:59:36">2025-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/06/huggingface%E4%B8%ADDatasets%E6%A8%A1%E5%9D%97%E7%9A%84%E7%AC%94%E8%AE%B0/" title="huggingface中Datasets模块的笔记">huggingface中Datasets模块的笔记</a><time datetime="2025-01-06T12:43:34.000Z" title="发表于 2025-01-06 20:43:34">2025-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/04/LLM%E8%AF%84%E4%BC%B0/" title="LLM评估">LLM评估</a><time datetime="2025-01-04T12:45:23.000Z" title="发表于 2025-01-04 20:45:23">2025-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By LiSheng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script>function runPanguForPostContent() {
+  const postContent = document.querySelector('.post-content');
+
+  if (postContent) {
+    pangu.spacingNode(postContent); // 只处理文章内容区域
+  }
+}
+
+function panguFn() {
+  if (typeof pangu === 'object') {
+    runPanguForPostContent();
+  } else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        runPanguForPostContent();
+      });
+  }
+}
+
+function panguInit() {
+  if (false) {
+    GLOBAL_CONFIG_SITE.isPost && panguFn();
+  } else {
+    panguFn();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit);</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addModeChange('mermaid', runMermaid)
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>function loadUtterances () {
+  let ele = document.createElement('script')
+  ele.setAttribute('id', 'utterances_comment')
+  ele.setAttribute('src', 'https://utteranc.es/client.js')
+  ele.setAttribute('repo', 'LiSheng2001/LiSheng2001.github.io')
+  ele.setAttribute('issue-term', 'pathname')
+  let nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+  ele.setAttribute('theme', nowTheme)
+  ele.setAttribute('crossorigin', 'anonymous')
+  ele.setAttribute('async', 'true')
+  document.getElementById('utterances-wrap').insertAdjacentElement('afterbegin',ele)
+}
+
+function utterancesTheme (theme) {
+  const iframe = document.querySelector('.utterances-frame')
+  if (iframe) {
+    const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+    const message = {
+      type: 'set-theme',
+      theme: theme
+    };
+    iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+}
+
+btf.addModeChange('utterances', utterancesTheme)
+
+if ('Utterances' === 'Utterances' || !true) {
+  if (true) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+  else loadUtterances()
+} else {
+  function loadOtherComment () {
+    loadUtterances()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
